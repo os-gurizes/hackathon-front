@@ -3,11 +3,11 @@ import type Konva from "konva";
 import { cx } from "../../../design/cx";
 import { Button, Icon, Select } from "../../../design/primitives";
 import { pointAt } from "../../../map/abilityShapes";
-import { AGENTS, assetUrl, DEFAULT_MAP, findAbility, findMap, type Point } from "../../../map/mapData";
+import { AGENTS, assetUrl, DEFAULT_MAP, findAbility, findMap, type Point, findAgent } from "../../../map/mapData";
 import { MapCanvas, type MapPointerEvent } from "../../../map/MapCanvas";
 import { nextRotation } from "../../../map/transform";
 import { useTokens } from "../../../map/useTokens";
-import { canJoin, MAX_PER_SIDE, teamOf } from "../playbook/composition";
+import { checkPlacement, findPlaced, MAX_PER_SIDE } from "../playbook/composition";
 import { createId, PHASES, type AgentItem, type Phase, type PlaybookItem, type Side } from "../playbook/types";
 import { AgentPopover } from "./AgentPopover";
 import { usePlaybookPersistence, type SaveStatus } from "./usePlaybookPersistence";
@@ -51,8 +51,9 @@ export default function PranchetaPage() {
   );
 
   const sideColor = useCallback((s: Side) => (s === "attack" ? tokens.signal : tokens.cyan), [tokens]);
-  const sideName = (s: Side) => (s === "attack" ? "ataque" : "defesa");
-  const fullSides = (["attack", "defense"] as const).filter((s) => teamOf(playbook.items, s).agents.length >= MAX_PER_SIDE);
+  // "no ataque", "na defesa": o artigo muda com o lado
+  const inSide = (s: Side) => (s === "attack" ? "no ataque" : "na defesa");
+  const theSide = (s: Side) => (s === "attack" ? "O ataque" : "A defesa");
 
   /** Coloca uma habilidade; as que têm direção já ficam selecionadas para mirar pela alça. */
   const placeAbility = (id: string, at: Point, phase: Phase, side: Side, ownerId?: string) => {
@@ -65,13 +66,54 @@ export default function PranchetaPage() {
     return { item, aim: shape != null && shape.type !== "area" };
   };
 
-  const placeAgent = (id: string, at: Point) => {
-    if (!canJoin(playbook.items, id, placeSide)) {
-      notify(`O ${sideName(placeSide)} já tem ${MAX_PER_SIDE} agentes. Remova um ou troque o lado de quem entra.`);
-      return;
-    }
-    add({ id: createId(), phase: activePhase, kind: "agent", agentId: id, side: placeSide, at });
+  /** Leva ao marcador que já existe: seleciona e abre o menu dele. */
+  const focusAgent = (item: AgentItem) => {
+    setTool("select");
+    setDraft(null);
+    setSelectedId(item.id);
+    setPopoverId(item.id);
   };
+
+  /** Confere as regras antes de colocar; se não der, avisa e leva ao que já existe. */
+  const guardPlacement = (id: string): boolean => {
+    const check = checkPlacement(playbook.items, id, placeSide, activePhase);
+    if (check.ok) return true;
+    const name = findAgent(id)?.name ?? "Este agente";
+    if (check.reason === "placed") {
+      notify(`${name} já está ${inSide(placeSide)} na fase ${PHASE_INFO[activePhase].name}. Abri o menu dele.`);
+      focusAgent(check.existing);
+    } else {
+      notify(`${theSide(placeSide)} já tem ${MAX_PER_SIDE} agentes. Remova um ou troque o lado de quem entra.`);
+    }
+    return false;
+  };
+
+  const placeAgent = (id: string, at: Point) => {
+    if (!guardPlacement(id)) return;
+    const item: AgentItem = { id: createId(), phase: activePhase, kind: "agent", agentId: id, side: placeSide, at };
+    add(item);
+    // Um clique, um agente: volta para Selecionar com ele selecionado
+    setTool("select");
+    setSelectedId(item.id);
+  };
+
+  const pickAgent = (id: string) => {
+    setAgentId(id);
+    setAbilityId(null);
+    if (guardPlacement(id)) pickTool("agent");
+  };
+
+  /** Lados para onde o marcador não pode ir, com o motivo. */
+  const blockedSides = (item: AgentItem) =>
+    Object.fromEntries(
+      (["attack", "defense"] as const).flatMap((s) => {
+        if (s === item.side) return [];
+        const check = checkPlacement(playbook.items, item.agentId, s, item.phase, item.id);
+        if (check.ok) return [];
+        const reason = check.reason === "placed" ? "já está desse lado nesta fase" : `time já tem ${MAX_PER_SIDE} agentes`;
+        return [[s, reason]];
+      }),
+    ) as Partial<Record<Side, string>>;
 
   // Habilidades pelo menu do agente nascem em volta dele, sem empilhar
   const abilityNearAgent = (owner: AgentItem, id: string) => {
@@ -316,11 +358,7 @@ export default function PranchetaPage() {
         <aside className={styles.left} aria-label="Composição, fases e notas">
           <CompositionPanel
             playbook={playbook}
-            onAgent={(id) => {
-              setAgentId(id);
-              setAbilityId(null);
-              pickTool("agent");
-            }}
+            onAgent={pickAgent}
           />
           <PhasesPanel
             playbook={playbook}
@@ -399,7 +437,7 @@ export default function PranchetaPage() {
                   item={popoverItem}
                   anchor={toScreen(popoverItem.at)}
                   frameSize={frameSize}
-                  fullSides={fullSides.filter((s) => !teamOf(playbook.items, s).agents.some((a) => a.id === popoverItem.agentId))}
+                  blocked={blockedSides(popoverItem)}
                   onSide={(side) => dispatch({ type: "update", id: popoverItem.id, patch: { side } })}
                   onAbility={(id) => abilityNearAgent(popoverItem, id)}
                   onWeapon={(weaponId) =>
@@ -483,11 +521,10 @@ export default function PranchetaPage() {
             abilityId={tool === "ability" ? abilityId : null}
             placeSide={placeSide}
             onPlaceSide={setPlaceSide}
-            onAgent={(id) => {
-              setAgentId(id);
-              setAbilityId(null);
-              pickTool("agent");
-            }}
+            placedIds={
+              new Set(AGENTS.filter((a) => findPlaced(playbook.items, a.id, placeSide, activePhase)).map((a) => a.id))
+            }
+            onAgent={pickAgent}
             onAbility={(id) => {
               setAbilityId(id);
               setTool("ability");

@@ -1,5 +1,5 @@
 import { findAgent, ROLES, type AgentInfo } from "../../../map/mapData";
-import type { PlaybookItem, Side } from "./types";
+import type { AgentItem, Phase, PlaybookItem, Side } from "./types";
 
 export const MAX_PER_SIDE = 5;
 
@@ -30,4 +30,30 @@ export function teamOf(items: PlaybookItem[], side: Side): Team {
 export function canJoin(items: PlaybookItem[], agentId: string, side: Side): boolean {
   const team = teamOf(items, side);
   return team.agents.some((a) => a.id === agentId) || team.agents.length < MAX_PER_SIDE;
+}
+
+/** O marcador deste agente neste lado e fase, se já existir. */
+export function findPlaced(items: PlaybookItem[], agentId: string, side: Side, phase: Phase): AgentItem | undefined {
+  return items.find((i): i is AgentItem => i.kind === "agent" && i.agentId === agentId && i.side === side && i.phase === phase);
+}
+
+export type PlaceCheck = { ok: true } | { ok: false; reason: "placed"; existing: AgentItem } | { ok: false; reason: "full" };
+
+/**
+ * Regras de colocação: em cada fase o agente aparece no máximo uma vez por lado (ou seja,
+ * no máximo duas vezes: uma no ataque e uma na defesa), e cada time tem até cinco agentes.
+ * `ignoreId` permite checar a troca de lado de um marcador que já existe.
+ */
+export function checkPlacement(
+  items: PlaybookItem[],
+  agentId: string,
+  side: Side,
+  phase: Phase,
+  ignoreId?: string,
+): PlaceCheck {
+  const others = ignoreId ? items.filter((i) => i.id !== ignoreId) : items;
+  const existing = findPlaced(others, agentId, side, phase);
+  if (existing) return { ok: false, reason: "placed", existing };
+  if (!canJoin(others, agentId, side)) return { ok: false, reason: "full" };
+  return { ok: true };
 }

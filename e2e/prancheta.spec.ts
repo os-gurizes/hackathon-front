@@ -140,3 +140,37 @@ test("não deixa um sexto agente entrar no mesmo lado", async ({ page }) => {
   await expect(page.getByRole("status")).toContainText("já tem 5 agentes");
   await expect(phase(page, "Setup")).toContainText("5 itens");
 });
+
+test("vários cliques depois de escolher a Jett põem uma Jett só", async ({ page }) => {
+  const pieces = page.getByRole("complementary", { name: "Agentes, habilidades e mapa" });
+  await pieces.getByRole("button", { name: "Jett", exact: true }).click();
+  await clickOnMap(page, [0.4, 0.8]);
+  await clickOnMap(page, [0.5, 0.8]);
+  await clickOnMap(page, [0.6, 0.8]);
+  await expect(phase(page, "Setup")).toContainText("1 item");
+  await expect(page.getByRole("button", { name: "Selecionar e mover" })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("em cada fase a Jett entra uma vez no ataque e uma na defesa", async ({ page }) => {
+  const pieces = page.getByRole("complementary", { name: "Agentes, habilidades e mapa" });
+  const jett = pieces.getByRole("button", { name: /^Jett/ });
+
+  await jett.click();
+  await clickOnMap(page, [0.4, 0.8]);
+  await pieces.getByRole("button", { name: "Entra na defesa" }).click();
+  await jett.click();
+  await clickOnMap(page, [0.4, 0.3]);
+  await expect(phase(page, "Setup")).toContainText("2 itens");
+
+  // A terceira não entra: abre o menu da Jett que já está na defesa
+  await jett.click();
+  await expect(page.getByRole("status")).toContainText("Jett já está na defesa na fase Setup");
+  await expect(page.getByRole("dialog", { name: "Opções de Jett" })).toBeVisible();
+  await expect(phase(page, "Setup")).toContainText("2 itens");
+
+  // Em outra fase ela pode entrar de novo
+  await page.getByText("Execução", { exact: true }).click();
+  await jett.click();
+  await clickOnMap(page, [0.45, 0.5]);
+  await expect(phase(page, "Execução")).toContainText("1 item");
+});

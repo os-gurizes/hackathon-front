@@ -70,6 +70,7 @@ export function PiecesPanel({
   abilityId,
   placeSide,
   onPlaceSide,
+  placedIds,
   onAgent,
   onAbility,
 }: {
@@ -77,6 +78,7 @@ export function PiecesPanel({
   abilityId: string | null;
   placeSide: Side;
   onPlaceSide: (s: Side) => void;
+  placedIds: Set<string>;
   onAgent: (id: string) => void;
   onAbility: (id: string) => void;
 }) {
@@ -108,9 +110,9 @@ export function PiecesPanel({
               <button
                 key={a.id}
                 type="button"
-                className={cx(styles.agent, a.id === agentId && styles.agentOn)}
+                className={cx(styles.agent, a.id === agentId && styles.agentOn, placedIds.has(a.id) && styles.agentPlaced)}
                 aria-label={a.name}
-                title={a.name}
+                title={placedIds.has(a.id) ? `${a.name}: já está no mapa nesta fase. Clique para abrir o menu dele.` : a.name}
                 aria-pressed={a.id === agentId}
                 onClick={() => onAgent(a.id)}
               >

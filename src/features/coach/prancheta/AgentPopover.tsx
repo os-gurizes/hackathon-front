@@ -11,7 +11,8 @@ type Props = {
   item: AgentItem;
   anchor: Point;
   frameSize: number;
-  fullSides: Side[];
+  /** Lados para onde o agente não pode ir, com o motivo. */
+  blocked: Partial<Record<Side, string>>;
   onSide: (side: Side) => void;
   onAbility: (abilityId: string) => void;
   onWeapon: (weaponId: string | null) => void;
@@ -28,7 +29,7 @@ const byCategory = (weapons: WeaponInfo[]) =>
   }, []);
 
 /** Menu do agente no mapa: lado, habilidades que nascem perto dele, arma e remover. */
-export function AgentPopover({ item, anchor, frameSize, fullSides, onSide, onAbility, onWeapon, onRemove, onClose }: Props) {
+export function AgentPopover({ item, anchor, frameSize, blocked, onSide, onAbility, onWeapon, onRemove, onClose }: Props) {
   const [allWeapons, setAllWeapons] = useState(false);
   const agent = findAgent(item.agentId);
   if (!agent) return null;
@@ -62,15 +63,15 @@ export function AgentPopover({ item, anchor, frameSize, fullSides, onSide, onAbi
 
       <div role="group" aria-label="Lado" className={styles.sides}>
         {(["attack", "defense"] as const).map((s) => {
-          const full = fullSides.includes(s) && item.side !== s;
+          const reason = blocked[s];
           return (
             <button
               key={s}
               type="button"
               className={cx(styles.side, item.side === s && styles.sideOn)}
               aria-pressed={item.side === s}
-              disabled={full}
-              title={full ? `${s === "attack" ? "Ataque" : "Defesa"} já tem 5 agentes` : undefined}
+              disabled={reason != null}
+              title={reason ? `${agent.name} não pode ir para ${s === "attack" ? "o ataque" : "a defesa"}: ${reason}` : undefined}
               onClick={() => onSide(s)}
             >
               <Icon name={s} size={16} className={s === "attack" ? styles.attack : styles.defense} />

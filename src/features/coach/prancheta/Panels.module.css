@@ -60,3 +60,7 @@
 .roles { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 .gap { margin: 0; display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: var(--bone); }
 .gap svg { color: var(--signal-text); }
+/* Já está no mapa nesta fase e lado: esmaecido, com o canto marcado */
+.agentPlaced { position: relative; }
+.agentPlaced img { opacity: 0.4; }
+.agentPlaced::after { content: ""; position: absolute; right: 2px; bottom: 2px; width: 8px; height: 8px; background: var(--bone); clip-path: polygon(100% 0, 100% 100%, 0 100%); }
