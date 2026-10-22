@@ -19,9 +19,9 @@ const COACH_TABS = [
 
 type CoachTab = (typeof COACH_TABS)[number]["id"];
 
-export function AppShell({ active, children }: { active: CoachTab; children: ReactNode }) {
+export function AppShell({ active, wide, children }: { active: CoachTab; wide?: boolean; children: ReactNode }) {
   return (
-    <div className={styles.shell}>
+    <div className={cx(styles.shell, wide && styles.wide)}>
       <header className={styles.header}>
         <div className={styles.bar}>
           <a href="/" className={styles.brand}>

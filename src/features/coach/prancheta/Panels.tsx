@@ -78,7 +78,7 @@ export function PiecesPanel({
   const agent = AGENTS.find((a) => a.id === agentId);
   return (
     <section className={cx(styles.panel, "st-cut")} aria-labelledby="pecas">
-      <SectionLabel index={2} as="div">
+      <SectionLabel index={4} as="div">
         <span id="pecas">Agentes e habilidades</span>
       </SectionLabel>
       {ROLES.map((role) => (
@@ -140,7 +140,7 @@ export function MapPanel({
   ];
   return (
     <section className={cx(styles.panel, "st-cut")} aria-labelledby="mapa">
-      <SectionLabel index={3} as="div">
+      <SectionLabel index={2} as="div">
         <span id="mapa">Mapa e fundo</span>
       </SectionLabel>
       <Select
@@ -184,7 +184,7 @@ export function MapPanel({
 export function NotesPanel({ phase, value, onChange }: { phase: Phase; value: string; onChange: (v: string) => void }) {
   return (
     <section className={cx(styles.panel, "st-cut")}>
-      <SectionLabel index={4} as="div">
+      <SectionLabel index={3} as="div">
         <label htmlFor="phase-notes">Notas da fase: {PHASE_INFO[phase].name}</label>
       </SectionLabel>
       <textarea

@@ -1,4 +1,4 @@
-.wrap { width: 100%; max-width: 760px; }
+.wrap { width: 100%; }
 .frame { position: relative; width: 100%; aspect-ratio: 1 / 1; background: var(--ink-800); overflow: hidden; touch-action: none; user-select: none; }
 .frame canvas { display: block; }
 .zoom { position: absolute; right: var(--space-2); bottom: var(--space-2); display: flex; align-items: center; gap: 2px; background: var(--ink-900); padding: 2px; }

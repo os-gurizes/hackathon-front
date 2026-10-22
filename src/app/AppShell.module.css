@@ -20,3 +20,5 @@
 .tabOff { opacity: 0.55; cursor: default; }
 .main { flex: 1; padding-top: var(--space-6); padding-bottom: var(--space-12); }
 .footer { padding-bottom: var(--space-8); font-size: 12px; line-height: 18px; color: var(--bone-muted); }
+/* Telas de trabalho (prancheta) usam a largura toda da janela */
+.wide .bar, .wide .nav, .wide .main, .wide .footer { max-width: none; padding-left: var(--space-6); padding-right: var(--space-6); }

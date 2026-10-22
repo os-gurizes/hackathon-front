@@ -11,7 +11,7 @@ export function App() {
   if (path === "/referencia") return <ReferencePage />;
 
   return (
-    <AppShell active="prancheta">
+    <AppShell active="prancheta" wide>
       <Suspense fallback={null}>
         <PranchetaPage />
       </Suspense>

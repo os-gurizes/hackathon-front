@@ -280,6 +280,42 @@ export default function PranchetaPage() {
       </div>
 
       <div className={styles.body}>
+        <aside className={styles.left} aria-label="Fases, mapa e notas">
+          <PhasesPanel
+            playbook={playbook}
+            activePhase={activePhase}
+            presenting={presenting}
+            onPick={pickPhase}
+            onToggle={(p) =>
+              dispatch({
+                type: "set",
+                patch: {
+                  visiblePhases: playbook.visiblePhases.includes(p)
+                    ? playbook.visiblePhases.filter((v) => v !== p)
+                    : [...playbook.visiblePhases, p],
+                },
+              })
+            }
+            onPresent={() => setPresenting(presenting == null ? 0 : null)}
+            onClear={() => dispatch({ type: "clearPhase", phase: activePhase })}
+          />
+          <MapPanel
+            playbook={playbook}
+            onMap={(id) => {
+              const next = findMap(id);
+              if (next) dispatch({ type: "changeMap", mapId: next.id, rotation: next.attackDownRotation });
+            }}
+            onSide={(side) => dispatch({ type: "set", patch: { side } })}
+            onBackground={(background) => dispatch({ type: "set", patch: { background } })}
+          />
+          <NotesPanel
+            phase={activePhase}
+            value={playbook.notes[activePhase]}
+            onChange={(text) => dispatch({ type: "set", patch: { notes: { ...playbook.notes, [activePhase]: text } } })}
+          />
+        </aside>
+
+        <div className={styles.center}>
         <div role="toolbar" aria-label="Ferramentas de desenho" aria-orientation="vertical" className={cx(styles.toolbar, "st-cut")}>
           {TOOLS.map((t) => (
             <button
@@ -384,26 +420,9 @@ export default function PranchetaPage() {
                 : "Use a roda do mouse para dar zoom."}
           </p>
         </div>
+        </div>
 
-        <aside className={styles.aside}>
-          <PhasesPanel
-            playbook={playbook}
-            activePhase={activePhase}
-            presenting={presenting}
-            onPick={pickPhase}
-            onToggle={(p) =>
-              dispatch({
-                type: "set",
-                patch: {
-                  visiblePhases: playbook.visiblePhases.includes(p)
-                    ? playbook.visiblePhases.filter((v) => v !== p)
-                    : [...playbook.visiblePhases, p],
-                },
-              })
-            }
-            onPresent={() => setPresenting(presenting == null ? 0 : null)}
-            onClear={() => dispatch({ type: "clearPhase", phase: activePhase })}
-          />
+        <aside className={styles.right} aria-label="Agentes e habilidades">
           <PiecesPanel
             agentId={agentId}
             abilityId={tool === "ability" ? abilityId : null}
@@ -417,20 +436,6 @@ export default function PranchetaPage() {
               setTool("ability");
               setSelectedId(null);
             }}
-          />
-          <MapPanel
-            playbook={playbook}
-            onMap={(id) => {
-              const next = findMap(id);
-              if (next) dispatch({ type: "changeMap", mapId: next.id, rotation: next.attackDownRotation });
-            }}
-            onSide={(side) => dispatch({ type: "set", patch: { side } })}
-            onBackground={(background) => dispatch({ type: "set", patch: { background } })}
-          />
-          <NotesPanel
-            phase={activePhase}
-            value={playbook.notes[activePhase]}
-            onChange={(text) => dispatch({ type: "set", patch: { notes: { ...playbook.notes, [activePhase]: text } } })}
           />
         </aside>
       </div>
