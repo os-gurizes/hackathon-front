@@ -39,7 +39,7 @@ type Props = {
   onPointerMove?: (e: MapPointerEvent) => void;
   onPointerUp?: (e: MapPointerEvent) => void;
   children?: (ctx: MapContext) => ReactNode;
-  overlay?: (toScreen: (p: Point) => Point) => ReactNode;
+  overlay?: (toScreen: (p: Point) => Point, size: number) => ReactNode;
 };
 
 const BG = "map-bg";
@@ -205,7 +205,7 @@ export function MapCanvas({
           </Stage>
         ) : null}
         </div>
-        {size > 0 ? overlay?.(toScreen) : null}
+        {size > 0 ? overlay?.(toScreen, size) : null}
         <div className={styles.zoom} role="group" aria-label="Zoom">
           <button type="button" className={styles.zoomBtn} onClick={() => zoomBy(1.4)} aria-label="Aproximar" title="Aproximar">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="square" aria-hidden="true">

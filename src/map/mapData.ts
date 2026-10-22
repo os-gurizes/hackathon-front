@@ -1,5 +1,6 @@
 import agentsJson from "./data/agents.json";
 import mapsJson from "./data/maps.json";
+import weaponsJson from "./data/weapons.json";
 import { ABILITY_SHAPES, type AbilityShape } from "./abilityShapes";
 
 export type Point = { x: number; y: number };
@@ -30,7 +31,11 @@ export type AbilityInfo = {
   name: string;
   icon: string;
   shape: AbilityShape | null;
+  /** Habilidade que substitui a arma (facas da Jett, Headhunter do Chamber...). */
+  isWeapon: boolean;
 };
+
+export type WeaponInfo = { id: string; name: string; category: string; cost: number; icon: string };
 
 export type AgentInfo = {
   id: string;
@@ -70,6 +75,24 @@ export const MAPS: MapInfo[] = mapsJson
 
 const ROLE_ORDER = ["Duelista", "Iniciador", "Controlador", "Sentinela"];
 
+// Os dados não marcam quais habilidades substituem a arma; ids são `${agentId}-${slot}`
+const WEAPON_ABILITIES = new Set([
+  "add6443a-41bd-e414-f6ad-e58d267f4e95-Ultimate", // Jett: Tormenta de Aço
+  "22697a3d-45bf-8dd7-4fec-84a9e28c69d7-Ability1", // Chamber: Headhunter
+  "22697a3d-45bf-8dd7-4fec-84a9e28c69d7-Ultimate", // Chamber: Tour de Force
+  "f94c3b30-42be-e959-889c-5aa313dba261-Ultimate", // Raze: Showstopper
+  "bb2a4828-46eb-8cd1-e765-15848195d751-Ultimate", // Neon: Overdrive
+]);
+
+export const WEAPONS: WeaponInfo[] = weaponsJson;
+const weaponById = new Map(WEAPONS.map((w) => [w.id, w]));
+export const findWeapon = (id: string | undefined) => (id ? weaponById.get(id) : undefined);
+
+/** As armas mais comuns numa estratégia; o resto fica em "Todas". */
+export const QUICK_WEAPONS = ["Classic", "Sheriff", "Spectre", "Vandal", "Phantom", "Operator"]
+  .map((name) => WEAPONS.find((w) => w.name === name))
+  .filter((w): w is WeaponInfo => w != null);
+
 export const AGENTS: AgentInfo[] = agentsJson
   .map((a) => ({
     id: a.id,
@@ -78,7 +101,7 @@ export const AGENTS: AgentInfo[] = agentsJson
     icon: a.icon,
     abilities: a.abilities.map((h) => {
       const id = `${a.id}-${h.slot}`;
-      return { id, key: h.key, name: h.name, icon: h.icon, shape: ABILITY_SHAPES[id] ?? null };
+      return { id, key: h.key, name: h.name, icon: h.icon, shape: ABILITY_SHAPES[id] ?? null, isWeapon: WEAPON_ABILITIES.has(id) };
     }),
   }))
   .sort((a, b) => ROLE_ORDER.indexOf(a.role) - ROLE_ORDER.indexOf(b.role) || a.name.localeCompare(b.name, "pt-BR"));

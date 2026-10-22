@@ -7,10 +7,12 @@ import { AGENTS, assetUrl, DEFAULT_MAP, findAbility, findMap, type Point } from 
 import { MapCanvas, type MapPointerEvent } from "../../../map/MapCanvas";
 import { nextRotation } from "../../../map/transform";
 import { useTokens } from "../../../map/useTokens";
-import { createId, PHASES, type Phase, type PlaybookItem } from "../playbook/types";
+import { canJoin, MAX_PER_SIDE, teamOf } from "../playbook/composition";
+import { createId, PHASES, type AgentItem, type Phase, type PlaybookItem, type Side } from "../playbook/types";
+import { AgentPopover } from "./AgentPopover";
 import { usePlaybookPersistence, type SaveStatus } from "./usePlaybookPersistence";
 import { ItemView, PlaybookLayer, type LayerMode } from "./PlaybookLayer";
-import { MapPanel, NotesPanel, PhasesPanel, PiecesPanel } from "./Panels";
+import { CompositionPanel, MapPanel, NotesPanel, PhasesPanel, PiecesPanel } from "./Panels";
 import { distance, octagon, PHASE_INFO, roundPoint, TOOLS, type Tool } from "./tools";
 import styles from "./PranchetaPage.module.css";
 
@@ -23,7 +25,7 @@ const isTyping = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
 
 export default function PranchetaPage() {
-  const { history, dispatch, status, list, notice, ready, openById, createNew, duplicate, share } = usePlaybookPersistence();
+  const { history, dispatch, status, list, notice, notify, ready, openById, createNew, duplicate, share } = usePlaybookPersistence();
   const playbook = history.present;
   const map = findMap(playbook.mapId) ?? DEFAULT_MAP;
   const tokens = useTokens();
@@ -33,6 +35,8 @@ export default function PranchetaPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [agentId, setAgentId] = useState(AGENTS.find((a) => a.name === "Jett")?.id ?? AGENTS[0]!.id);
   const [abilityId, setAbilityId] = useState<string | null>(null);
+  const [placeSide, setPlaceSide] = useState<Side>("attack");
+  const [popoverId, setPopoverId] = useState<string | null>(null);
   const [draft, setDraft] = useState<PlaybookItem | null>(null);
   const [live, setLive] = useState<Live>(null);
   const [textEdit, setTextEdit] = useState<TextEdit>(null);
@@ -45,6 +49,40 @@ export default function PranchetaPage() {
     (p: Phase) => ({ setup: tokens.boneMuted, exec: tokens.signal, post: tokens.gold, retake: tokens.cyan })[p],
     [tokens],
   );
+
+  const sideColor = useCallback((s: Side) => (s === "attack" ? tokens.signal : tokens.cyan), [tokens]);
+  const sideName = (s: Side) => (s === "attack" ? "ataque" : "defesa");
+  const fullSides = (["attack", "defense"] as const).filter((s) => teamOf(playbook.items, s).agents.length >= MAX_PER_SIDE);
+
+  /** Coloca uma habilidade; as que têm direção já ficam selecionadas para mirar pela alça. */
+  const placeAbility = (id: string, at: Point, phase: Phase, side: Side, ownerId?: string) => {
+    const shape = findAbility(id)?.ability.shape ?? null;
+    // Nasce apontando para cima na tela, qualquer que seja a rotação do mapa
+    const rotation = -playbook.rotation;
+    const end = shape?.type === "tripwire" ? roundPoint(pointAt(at, rotation + 90, 5 * map.metersToMinimap)) : undefined;
+    const item: PlaybookItem = { id: createId(), phase, kind: "ability", abilityId: id, side, at, rotation, ...(end ? { end } : {}), ...(ownerId ? { ownerId } : {}) };
+    add(item);
+    return { item, aim: shape != null && shape.type !== "area" };
+  };
+
+  const placeAgent = (id: string, at: Point) => {
+    if (!canJoin(playbook.items, id, placeSide)) {
+      notify(`O ${sideName(placeSide)} já tem ${MAX_PER_SIDE} agentes. Remova um ou troque o lado de quem entra.`);
+      return;
+    }
+    add({ id: createId(), phase: activePhase, kind: "agent", agentId: id, side: placeSide, at });
+  };
+
+  // Habilidades pelo menu do agente nascem em volta dele, sem empilhar
+  const abilityNearAgent = (owner: AgentItem, id: string) => {
+    const count = playbook.items.filter((i) => i.kind === "ability" && i.ownerId === owner.id).length;
+    const angle = ((count * 60 - 30) * Math.PI) / 180;
+    const at = roundPoint({ x: owner.at.x + Math.cos(angle) * 0.04, y: owner.at.y + Math.sin(angle) * 0.04 });
+    placeAbility(id, at, owner.phase, owner.side, owner.id);
+  };
+
+  const popoverItem = playbook.items.find((i): i is AgentItem => i.id === popoverId && i.kind === "agent");
+  const showPopover = popoverItem != null && popoverId === selectedId && tool === "select" && presenting == null;
 
   const shownPhase = presenting != null ? PHASES[presenting]! : activePhase;
   const visible = presenting != null ? PHASES.slice(0, presenting + 1) : playbook.visiblePhases;
@@ -120,19 +158,14 @@ export default function PranchetaPage() {
         setDraft({ ...base, kind: "area", points: octagon(p, 0) });
         return;
       case "agent":
-        add({ ...base, kind: "agent", agentId, at: p });
+        placeAgent(agentId, p);
         return;
       case "ability": {
         if (!abilityId) return;
-        const shape = findAbility(abilityId)?.ability.shape ?? null;
-        // Nasce apontando para cima na tela, qualquer que seja a rotação do mapa
-        const rotation = -playbook.rotation;
-        const end = shape?.type === "tripwire" ? roundPoint(pointAt(p, rotation + 90, 5 * map.metersToMinimap)) : undefined;
-        add({ ...base, kind: "ability", abilityId, at: p, rotation, ...(end ? { end } : {}) });
-        // Formas com direção pedem mira: já deixa selecionado para arrastar a alça
-        if (shape && shape.type !== "area") {
+        const { item, aim } = placeAbility(abilityId, p, activePhase, placeSide);
+        if (aim) {
           setTool("select");
-          setSelectedId(base.id);
+          setSelectedId(item.id);
         }
         return;
       }
@@ -280,7 +313,15 @@ export default function PranchetaPage() {
       </div>
 
       <div className={styles.body}>
-        <aside className={styles.left} aria-label="Fases, mapa e notas">
+        <aside className={styles.left} aria-label="Composição, fases e notas">
+          <CompositionPanel
+            playbook={playbook}
+            onAgent={(id) => {
+              setAgentId(id);
+              setAbilityId(null);
+              pickTool("agent");
+            }}
+          />
           <PhasesPanel
             playbook={playbook}
             activePhase={activePhase}
@@ -298,15 +339,6 @@ export default function PranchetaPage() {
             }
             onPresent={() => setPresenting(presenting == null ? 0 : null)}
             onClear={() => dispatch({ type: "clearPhase", phase: activePhase })}
-          />
-          <MapPanel
-            playbook={playbook}
-            onMap={(id) => {
-              const next = findMap(id);
-              if (next) dispatch({ type: "changeMap", mapId: next.id, rotation: next.attackDownRotation });
-            }}
-            onSide={(side) => dispatch({ type: "set", patch: { side } })}
-            onBackground={(background) => dispatch({ type: "set", patch: { background } })}
           />
           <NotesPanel
             phase={activePhase}
@@ -360,8 +392,26 @@ export default function PranchetaPage() {
             onPointerDown={presenting == null ? handleDown : undefined}
             onPointerMove={handleMove}
             onPointerUp={handleUp}
-            overlay={(toScreen) =>
-              textEdit ? (
+            overlay={(toScreen, frameSize) =>
+              showPopover && popoverItem ? (
+                <AgentPopover
+                  key={popoverItem.id}
+                  item={popoverItem}
+                  anchor={toScreen(popoverItem.at)}
+                  frameSize={frameSize}
+                  fullSides={fullSides.filter((s) => !teamOf(playbook.items, s).agents.some((a) => a.id === popoverItem.agentId))}
+                  onSide={(side) => dispatch({ type: "update", id: popoverItem.id, patch: { side } })}
+                  onAbility={(id) => abilityNearAgent(popoverItem, id)}
+                  onWeapon={(weaponId) =>
+                    dispatch({ type: "update", id: popoverItem.id, patch: weaponId ? { weaponId } : { weaponId: undefined } })
+                  }
+                  onRemove={() => {
+                    onErase(popoverItem.id);
+                    setPopoverId(null);
+                  }}
+                  onClose={() => setPopoverId(null)}
+                />
+              ) : textEdit ? (
                 <input
                   autoFocus
                   aria-label="Texto na prancheta"
@@ -387,6 +437,11 @@ export default function PranchetaPage() {
                   activePhase={shownPhase}
                   selectedId={selectedId}
                   phaseColor={phaseColor}
+                  sideColor={sideColor}
+                  onOpenAgent={(id) => {
+                    setSelectedId(id);
+                    setPopoverId(id);
+                  }}
                   ctx={ctx}
                   mode={mode}
                   onSelect={setSelectedId}
@@ -422,10 +477,12 @@ export default function PranchetaPage() {
         </div>
         </div>
 
-        <aside className={styles.right} aria-label="Agentes e habilidades">
+        <aside className={styles.right} aria-label="Agentes, habilidades e mapa">
           <PiecesPanel
             agentId={agentId}
             abilityId={tool === "ability" ? abilityId : null}
+            placeSide={placeSide}
+            onPlaceSide={setPlaceSide}
             onAgent={(id) => {
               setAgentId(id);
               setAbilityId(null);
@@ -436,6 +493,15 @@ export default function PranchetaPage() {
               setTool("ability");
               setSelectedId(null);
             }}
+          />
+          <MapPanel
+            playbook={playbook}
+            onMap={(id) => {
+              const next = findMap(id);
+              if (next) dispatch({ type: "changeMap", mapId: next.id, rotation: next.attackDownRotation });
+            }}
+            onSide={(side) => dispatch({ type: "set", patch: { side } })}
+            onBackground={(background) => dispatch({ type: "set", patch: { background } })}
           />
         </aside>
       </div>

@@ -1,6 +1,7 @@
 import { cx } from "../../../design/cx";
-import { Button, Icon, SectionLabel, Select } from "../../../design/primitives";
+import { Badge, Button, Icon, SectionLabel, Select } from "../../../design/primitives";
 import { AGENTS, assetUrl, MAPS, ROLES } from "../../../map/mapData";
+import { MAX_PER_SIDE, ROLE_GAPS, teamOf } from "../playbook/composition";
 import { PHASES, type Background, type Phase, type Playbook, type Side } from "../playbook/types";
 import { PHASE_INFO } from "./tools";
 import styles from "./Panels.module.css";
@@ -25,7 +26,7 @@ export function PhasesPanel({
   const count = (p: Phase) => playbook.items.filter((i) => i.phase === p).length;
   return (
     <section className={cx(styles.panel, "st-cut")} aria-labelledby="fases">
-      <SectionLabel index={1} as="div">
+      <SectionLabel index={2} as="div">
         <span id="fases">Fases</span>
       </SectionLabel>
       {PHASES.map((p) => {
@@ -67,11 +68,15 @@ export function PhasesPanel({
 export function PiecesPanel({
   agentId,
   abilityId,
+  placeSide,
+  onPlaceSide,
   onAgent,
   onAbility,
 }: {
   agentId: string;
   abilityId: string | null;
+  placeSide: Side;
+  onPlaceSide: (s: Side) => void;
   onAgent: (id: string) => void;
   onAbility: (id: string) => void;
 }) {
@@ -81,6 +86,20 @@ export function PiecesPanel({
       <SectionLabel index={4} as="div">
         <span id="pecas">Agentes e habilidades</span>
       </SectionLabel>
+      <div role="group" aria-label="Time de quem entra no mapa" className={styles.sides}>
+        {(["attack", "defense"] as const).map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={cx(styles.option, placeSide === s && styles.optionOn)}
+            aria-pressed={placeSide === s}
+            onClick={() => onPlaceSide(s)}
+          >
+            <Icon name={s} size={16} className={s === "attack" ? styles.attack : styles.defense} />
+            <span>{s === "attack" ? "Entra no ataque" : "Entra na defesa"}</span>
+          </button>
+        ))}
+      </div>
       {ROLES.map((role) => (
         <div key={role} className={styles.roleGroup}>
           <span className={styles.roleName}>{role}</span>
@@ -140,7 +159,7 @@ export function MapPanel({
   ];
   return (
     <section className={cx(styles.panel, "st-cut")} aria-labelledby="mapa">
-      <SectionLabel index={2} as="div">
+      <SectionLabel index={5} as="div">
         <span id="mapa">Mapa e fundo</span>
       </SectionLabel>
       <Select
@@ -196,6 +215,57 @@ export function NotesPanel({ phase, value, onChange }: { phase: Phase; value: st
         placeholder="O que cada um faz nesta fase."
         onChange={(e) => onChange(e.target.value)}
       />
+    </section>
+  );
+}
+
+export function CompositionPanel({ playbook, onAgent }: { playbook: Playbook; onAgent: (agentId: string) => void }) {
+  return (
+    <section className={cx(styles.panel, "st-cut")} aria-labelledby="composicao">
+      <SectionLabel index={1} as="div">
+        <span id="composicao">Composição</span>
+      </SectionLabel>
+      {(["attack", "defense"] as const).map((side) => {
+        const team = teamOf(playbook.items, side);
+        const label = side === "attack" ? "Ataque" : "Defesa";
+        return (
+          <div key={side} className={styles.team}>
+            <div className={styles.teamHead}>
+              <Icon name={side} size={16} className={side === "attack" ? styles.attack : styles.defense} />
+              <strong>{label}</strong>
+              <span className={styles.count}>
+                {team.agents.length} de {MAX_PER_SIDE}
+              </span>
+            </div>
+            {team.agents.length ? (
+              <>
+                <div className={styles.teamAgents}>
+                  {team.agents.map((a) => (
+                    <button key={a.id} type="button" className={styles.agent} title={a.name} aria-label={a.name} onClick={() => onAgent(a.id)}>
+                      <img src={assetUrl(a.icon)} alt="" width={32} height={32} />
+                    </button>
+                  ))}
+                </div>
+                <div className={styles.roles}>
+                  {ROLES.map((r) => (
+                    <Badge key={r} tone={team.roleCounts[r] ? "neutral" : "estimate"} icon={null}>
+                      {r} {team.roleCounts[r]}
+                    </Badge>
+                  ))}
+                </div>
+                {team.missingRoles.map((r) => (
+                  <p key={r} className={styles.gap}>
+                    <Icon name="alert" size={14} />
+                    Sem {r}: {ROLE_GAPS[r]}.
+                  </p>
+                ))}
+              </>
+            ) : (
+              <p className={styles.hint}>Nenhum agente {side === "attack" ? "no ataque" : "na defesa"} ainda.</p>
+            )}
+          </div>
+        );
+      })}
     </section>
   );
 }

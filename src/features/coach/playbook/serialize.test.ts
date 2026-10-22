@@ -9,8 +9,8 @@ const playbook: Playbook = {
   side: "attack",
   rotation: 90,
   items: [
-    { id: "a", phase: "setup", kind: "agent", agentId: "jett", at: { x: 0.5, y: 0.9 } },
-    { id: "b", phase: "exec", kind: "ability", abilityId: "omen-Ability2", at: { x: 0.3, y: 0.3 }, rotation: 45 },
+    { id: "a", phase: "setup", kind: "agent", agentId: "jett", side: "attack", weaponId: "vandal", at: { x: 0.5, y: 0.9 } },
+    { id: "b", phase: "exec", kind: "ability", abilityId: "omen-Ability2", side: "defense", ownerId: "a", at: { x: 0.3, y: 0.3 }, rotation: 45 },
     { id: "c", phase: "exec", kind: "arrow", points: [{ x: 0.1, y: 0.2 }, { x: 0.3, y: 0.4 }] },
     { id: "d", phase: "post", kind: "text", at: { x: 0.2, y: 0.2 }, text: "Plant aqui" },
   ],

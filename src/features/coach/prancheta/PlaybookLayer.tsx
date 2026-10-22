@@ -1,12 +1,12 @@
 import type { KonvaEventObject } from "konva/lib/Node";
 import { Circle, Group, Image as KImage, Line, Rect } from "react-konva";
 import { angleTo, handlePosition, pointAt } from "../../../map/abilityShapes";
-import { assetUrl, findAbility, findAgent, type Point } from "../../../map/mapData";
+import { assetUrl, findAbility, findAgent, findWeapon, type Point } from "../../../map/mapData";
 import type { MapContext } from "../../../map/MapCanvas";
 import { TagLabel } from "../../../map/TagLabel";
 import { useImage } from "../../../map/useImage";
 import { withAlpha } from "../../../map/useTokens";
-import type { AbilityItem, AgentItem, AreaItem, ArrowItem, PenItem, Phase, PlaybookItem, TextItem } from "../playbook/types";
+import type { AbilityItem, AgentItem, AreaItem, ArrowItem, PenItem, Phase, PlaybookItem, Side, TextItem } from "../playbook/types";
 
 export type LayerMode = "select" | "erase" | "none";
 
@@ -20,6 +20,7 @@ type Common = {
   onErase: (id: string) => void;
   onChange: (id: string, patch: Partial<PlaybookItem>, final: boolean) => void;
   onEditText: (id: string) => void;
+  onOpenAgent?: (id: string) => void;
 };
 
 type LayerProps = Omit<Common, "color" | "dim" | "selected"> & {
@@ -27,9 +28,18 @@ type LayerProps = Omit<Common, "color" | "dim" | "selected"> & {
   activePhase: Phase;
   selectedId: string | null;
   phaseColor: (p: Phase) => string;
+  sideColor: (s: Side) => string;
 };
 
-export function PlaybookLayer({ items, activePhase, selectedId, phaseColor, ...rest }: LayerProps) {
+export function PlaybookLayer({ items, activePhase, selectedId, phaseColor, sideColor, ...rest }: LayerProps) {
+  // Agentes e habilidades levam a cor do lado (a habilidade herda o lado de quem a usou);
+  // desenhos levam a cor da fase
+  const agentSide = new Map(items.flatMap((i) => (i.kind === "agent" ? [[i.id, i.side] as const] : [])));
+  const colorOf = (item: PlaybookItem) => {
+    if (item.kind === "agent") return sideColor(item.side);
+    if (item.kind === "ability") return sideColor((item.ownerId && agentSide.get(item.ownerId)) || item.side);
+    return phaseColor(item.phase);
+  };
   // A fase em edição fica por cima das outras
   const ordered = [...items.filter((i) => i.phase !== activePhase), ...items.filter((i) => i.phase === activePhase)];
   return (
@@ -38,7 +48,7 @@ export function PlaybookLayer({ items, activePhase, selectedId, phaseColor, ...r
         <ItemView
           key={item.id}
           item={item}
-          color={phaseColor(item.phase)}
+          color={colorOf(item)}
           dim={item.phase !== activePhase}
           selected={item.id === selectedId}
           {...rest}
@@ -130,14 +140,22 @@ function SelectionBox({ half, ctx }: { half: number; ctx: MapContext }) {
 }
 
 /** Quadrado com o canto superior direito cortado, como os cartões. */
+const octagonSquare = (h: number, c: number) => [-h + c, -h, h - c, -h, h, -h + c, h, h - c, h - c, h, -h + c, h, -h, h - c, -h, -h + c];
 const cutSquare = (half: number, cut: number) => [-half, -half, half - cut, -half, half, -half + cut, half, half, -half, half];
 
 function AgentMarker({ item, ...p }: Common & { item: AgentItem }) {
   const { ctx, color, dim, selected } = p;
   const agent = findAgent(item.agentId);
   const image = useImage(agent ? assetUrl(agent.icon) : undefined);
+  const weapon = findWeapon(item.weaponId) ?? null;
+  const weaponAbility = !weapon && item.weaponId ? findAbility(item.weaponId)?.ability : undefined;
+  const weaponImage = useImage(weapon ? assetUrl(weapon.icon) : weaponAbility ? assetUrl(weaponAbility.icon) : undefined);
   const half = 17 / ctx.zoom;
   const inset = 2 / ctx.zoom;
+  // Ataque e defesa não dependem só da cor: a defesa tem os quatro cantos cortados
+  const outline = item.side === "defense" ? octagonSquare(half, 7 / ctx.zoom) : cutSquare(half, 6 / ctx.zoom);
+  const badgeW = weapon ? 34 / ctx.zoom : 14 / ctx.zoom;
+  const badgeH = weapon ? 10 / ctx.zoom : 14 / ctx.zoom;
   return (
     <Group
       x={item.at.x * ctx.size}
@@ -146,10 +164,18 @@ function AgentMarker({ item, ...p }: Common & { item: AgentItem }) {
       opacity={dim ? 0.5 : 1}
       {...useItemEvents(item.id, p)}
       {...usePointDrag(item.id, p)}
+      onClick={() => p.mode === "select" && p.onOpenAgent?.(item.id)}
+      onTap={() => p.mode === "select" && p.onOpenAgent?.(item.id)}
     >
-      <Line points={cutSquare(half, 6 / ctx.zoom)} closed fill={color} />
+      <Line points={outline} closed fill={color} />
       <Rect x={-half + inset} y={-half + inset} width={(half - inset) * 2} height={(half - inset) * 2} fill={ctx.tokens.ink900} />
       {image ? <KImage image={image} x={-half + inset} y={-half + inset} width={(half - inset) * 2} height={(half - inset) * 2} /> : null}
+      {weaponImage ? (
+        <>
+          <Rect x={-badgeW / 2 - 2 / ctx.zoom} y={half + 1 / ctx.zoom} width={badgeW + 4 / ctx.zoom} height={badgeH + 4 / ctx.zoom} fill={ctx.tokens.ink900} />
+          <KImage image={weaponImage} x={-badgeW / 2} y={half + 3 / ctx.zoom} width={badgeW} height={badgeH} />
+        </>
+      ) : null}
       {selected ? <SelectionBox half={half} ctx={ctx} /> : null}
     </Group>
   );

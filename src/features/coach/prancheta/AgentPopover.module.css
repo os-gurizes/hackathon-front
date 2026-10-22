@@ -1,0 +1,48 @@
+.popover {
+  position: absolute; z-index: 5; transform: translateX(-50%); max-height: calc(100% - 16px); overflow: auto;
+  background: var(--ink-800); box-shadow: inset 0 0 0 var(--border-hairline) var(--line-strong);
+  padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3);
+  cursor: default; user-select: none;
+}
+.above { margin-top: -26px; translate: 0 -100%; }
+.below { margin-top: 30px; }
+.head { display: flex; align-items: center; gap: var(--space-2); }
+.head img { background: var(--ink-900); }
+.name { flex: 1; font: 700 18px/22px var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
+.close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--bone-muted); cursor: pointer; }
+.close:hover { color: var(--bone); background: var(--ink-700); }
+
+.sides { display: flex; gap: 2px; }
+.side {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; height: 32px; border: 0;
+  background: var(--ink-900); color: var(--bone-muted); cursor: pointer; font: 600 13px/16px var(--font-display);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.side:hover:not(:disabled) { color: var(--bone); }
+.side:disabled { opacity: 0.4; cursor: not-allowed; }
+.sideOn { background: var(--ink-700); color: var(--bone); }
+.attack { color: var(--signal-text); }
+.defense { color: var(--cyan); }
+
+.section { display: flex; flex-direction: column; gap: var(--space-1); }
+.label { font: 600 11px/14px var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted); }
+.row { display: flex; flex-wrap: wrap; gap: 4px; }
+.icon {
+  position: relative; min-width: 36px; height: 36px; padding: 0 6px; display: flex; align-items: center; justify-content: center;
+  border: 0; background: var(--ink-900); color: var(--bone); cursor: pointer;
+}
+.icon:hover { background: var(--ink-700); }
+.icon kbd { position: absolute; right: 2px; bottom: 1px; font: 700 9px/10px var(--font-display); color: var(--bone-muted); }
+.icon small { font: 600 11px/14px var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--bone-muted); }
+.iconOn { box-shadow: inset 0 0 0 var(--border-focus) var(--signal); background: var(--ink-700); }
+.weapon { width: 60px; }
+.weapon img { width: 48px; height: 12px; object-fit: contain; }
+.more { width: 60px; }
+.all { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2); }
+.close:focus-visible, .side:focus-visible, .icon:focus-visible, .remove:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--focus); }
+
+.remove {
+  display: flex; align-items: center; gap: var(--space-2); padding: 8px; border: 0; background: transparent;
+  color: var(--signal-text); cursor: pointer; font: 500 14px/20px var(--font-sans); text-align: left;
+}
+.remove:hover { background: var(--ink-700); }

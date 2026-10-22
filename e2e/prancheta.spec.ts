@@ -98,3 +98,45 @@ test("duplicar cria uma cópia separada da original", async ({ page }) => {
   await expect(page.getByLabel("Nome da estratégia")).toHaveValue("Retake A");
   await expect(phase(page, "Setup")).toContainText("1 item");
 });
+
+test("menu do agente troca arma e lado, põe habilidade perto dele e tudo persiste", async ({ page }) => {
+  const pieces = page.getByRole("complementary", { name: "Agentes, habilidades e mapa" });
+  await pieces.getByRole("button", { name: "Omen", exact: true }).click();
+  await clickOnMap(page, [0.5, 0.8]);
+
+  await page.getByRole("button", { name: "Selecionar e mover" }).click();
+  await clickOnMap(page, [0.5, 0.8]);
+  const menu = page.getByRole("dialog", { name: "Opções de Omen" });
+  await menu.getByRole("button", { name: "Vandal" }).click();
+  await expect(menu).toContainText("Arma: Vandal");
+  await menu.getByRole("button", { name: /Manto Sombrio/ }).click();
+  await menu.getByRole("button", { name: "Defesa" }).click();
+  await expect(phase(page, "Setup")).toContainText("2 itens");
+
+  const composition = page.getByRole("complementary", { name: /Composição/ });
+  await expect(composition).toContainText("Defesa1 de 5");
+
+  await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
+  await expect(status(page)).toHaveAttribute("data-status", "saved", { timeout: 5000 });
+
+  await page.reload();
+  await expect(status(page)).toHaveAttribute("data-status", "saved");
+  await expect(page.getByRole("complementary", { name: /Composição/ })).toContainText("Defesa1 de 5");
+  await page.getByRole("button", { name: "Selecionar e mover" }).click();
+  await clickOnMap(page, [0.5, 0.8]);
+  await expect(page.getByRole("dialog", { name: "Opções de Omen" })).toContainText("Arma: Vandal");
+});
+
+test("não deixa um sexto agente entrar no mesmo lado", async ({ page }) => {
+  const pieces = page.getByRole("complementary", { name: "Agentes, habilidades e mapa" });
+  const names = ["Jett", "Omen", "Sova", "Killjoy", "Raze"];
+  for (const [i, name] of names.entries()) {
+    await pieces.getByRole("button", { name, exact: true }).click();
+    await clickOnMap(page, [0.3 + i * 0.1, 0.8]);
+  }
+  await pieces.getByRole("button", { name: "Sage", exact: true }).click();
+  await clickOnMap(page, [0.5, 0.6]);
+  await expect(page.getByRole("status")).toContainText("já tem 5 agentes");
+  await expect(phase(page, "Setup")).toContainText("5 itens");
+});

@@ -157,5 +157,5 @@ export function usePlaybookPersistence(repo: PlaybookRepository = defaultRepo) {
     }
   };
 
-  return { history, dispatch, status, list, notice, ready, openById, createNew, duplicate, share };
+  return { history, dispatch, status, list, notice, notify: setNotice, ready, openById, createNew, duplicate, share };
 }

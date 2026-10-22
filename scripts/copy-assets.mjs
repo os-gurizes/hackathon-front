@@ -28,6 +28,9 @@ for (const a of readdirSync(join(SRC, "agentes"))) {
 }
 copy("funcoes");
 
+const weaponsRaw = JSON.parse(readFileSync(join(SRC, "dados/armas.json"), "utf8")).filter((w) => w.preco != null);
+for (const w of weaponsRaw) copy(w.imagens.silhueta);
+
 const maps = JSON.parse(readFileSync(join(SRC, "dados/mapas.json"), "utf8"))
   .filter((m) => MAPS.includes(m.nome.toLowerCase()))
   .map((m) => ({
@@ -51,6 +54,9 @@ const agents = JSON.parse(readFileSync(join(SRC, "dados/agentes.json"), "utf8"))
     .map((h) => ({ slot: h.slot, key: h.tecla, name: h.nome, icon: h.icone })),
 }));
 
+const weapons = weaponsRaw.map((w) => ({ id: w.id, name: w.nome, category: w.categoria, cost: w.preco, icon: w.imagens.silhueta }));
+
+writeFileSync(join(DATA, "weapons.json"), JSON.stringify(weapons, null, 1) + "\n");
 writeFileSync(join(DATA, "maps.json"), JSON.stringify(maps, null, 1) + "\n");
 writeFileSync(join(DATA, "agents.json"), JSON.stringify(agents, null, 1) + "\n");
-console.log(`${maps.length} mapas, ${agents.length} agentes`);
+console.log(`${maps.length} mapas, ${agents.length} agentes, ${weapons.length} armas`);

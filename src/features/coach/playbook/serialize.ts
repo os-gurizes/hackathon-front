@@ -32,18 +32,31 @@ function item(v: unknown): PlaybookItem | null {
   const id = str(v.id, 64) || createId();
   if (!phase) return null;
   const base = { id, phase };
+  // Itens salvos antes de existir lado entram no ataque
+  const side: Side = v.side === "defense" ? "defense" : "attack";
   switch (v.kind) {
     case "agent": {
       const at = point(v.at);
       const agentId = str(v.agentId, 64);
-      return at && agentId ? { ...base, kind: "agent", agentId, at } : null;
+      const weaponId = str(v.weaponId, 80);
+      return at && agentId ? { ...base, kind: "agent", agentId, side, at, ...(weaponId ? { weaponId } : {}) } : null;
     }
     case "ability": {
       const at = point(v.at);
       const abilityId = str(v.abilityId, 80);
       if (!at || !abilityId) return null;
       const end = point(v.end);
-      return { ...base, kind: "ability", abilityId, at, rotation: num(v.rotation) ? v.rotation : 0, ...(end ? { end } : {}) };
+      const ownerId = str(v.ownerId, 64);
+      return {
+        ...base,
+        kind: "ability",
+        abilityId,
+        side,
+        at,
+        rotation: num(v.rotation) ? v.rotation : 0,
+        ...(end ? { end } : {}),
+        ...(ownerId ? { ownerId } : {}),
+      };
     }
     case "arrow": {
       const pts = points(v.points, 2);

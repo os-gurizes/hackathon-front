@@ -10,8 +10,17 @@ type Base = { id: string; phase: Phase };
 
 // Todas as posições no espaço normalizado 0..1 do minimapa, sem rotação: o mesmo do ETL,
 // para que os desenhos se sobreponham ao heatmap e ao replay.
-export type AgentItem = Base & { kind: "agent"; agentId: string; at: Point };
-export type AbilityItem = Base & { kind: "ability"; abilityId: string; at: Point; rotation: number; end?: Point };
+export type AgentItem = Base & { kind: "agent"; agentId: string; side: Side; at: Point; weaponId?: string };
+/** `ownerId` liga a habilidade ao marcador do agente que a usou; o lado vem dele. */
+export type AbilityItem = Base & {
+  kind: "ability";
+  abilityId: string;
+  side: Side;
+  at: Point;
+  rotation: number;
+  end?: Point;
+  ownerId?: string;
+};
 export type ArrowItem = Base & { kind: "arrow"; points: [Point, Point] };
 export type PenItem = Base & { kind: "pen"; points: Point[] };
 export type AreaItem = Base & { kind: "area"; points: Point[] };
