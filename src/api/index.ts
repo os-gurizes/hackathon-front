@@ -1,0 +1,10 @@
+export { api, API_BASE, ApiError, unwrap, type ApiErrorCode } from "./client";
+export { q, createQueryClient } from "./queries";
+export { authService } from "./services/auth";
+export { catalogService } from "./services/catalog";
+export { insightsService, mapsService, statsService } from "./services/analytics";
+export { matchesService } from "./services/matches";
+export { playbookService } from "./services/playbook";
+export { playersService } from "./services/players";
+export { teamsService } from "./services/teams";
+export type * from "./types";
