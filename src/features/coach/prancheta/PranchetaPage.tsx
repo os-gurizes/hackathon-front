@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type Konva from "konva";
 import { cx } from "../../../design/cx";
-import { Button, Icon } from "../../../design/primitives";
+import { Button, Icon, Select } from "../../../design/primitives";
 import { pointAt } from "../../../map/abilityShapes";
 import { AGENTS, assetUrl, DEFAULT_MAP, findAbility, findMap, type Point } from "../../../map/mapData";
 import { MapCanvas, type MapPointerEvent } from "../../../map/MapCanvas";
 import { nextRotation } from "../../../map/transform";
 import { useTokens } from "../../../map/useTokens";
-import { historyReducer, initHistory } from "../playbook/history";
-import { createId, newPlaybook, PHASES, type Phase, type PlaybookItem } from "../playbook/types";
+import { createId, PHASES, type Phase, type PlaybookItem } from "../playbook/types";
+import { usePlaybookPersistence, type SaveStatus } from "./usePlaybookPersistence";
 import { ItemView, PlaybookLayer, type LayerMode } from "./PlaybookLayer";
 import { MapPanel, NotesPanel, PhasesPanel, PiecesPanel } from "./Panels";
 import { distance, octagon, PHASE_INFO, roundPoint, TOOLS, type Tool } from "./tools";
@@ -23,7 +23,7 @@ const isTyping = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
 
 export default function PranchetaPage() {
-  const [history, dispatch] = useReducer(historyReducer, undefined, () => initHistory(newPlaybook(DEFAULT_MAP)));
+  const { history, dispatch, status, list, notice, ready, openById, createNew, duplicate, share } = usePlaybookPersistence();
   const playbook = history.present;
   const map = findMap(playbook.mapId) ?? DEFAULT_MAP;
   const tokens = useTokens();
@@ -87,12 +87,12 @@ export default function PranchetaPage() {
     } else {
       setLive({ id, patch });
     }
-  }, []);
+  }, [dispatch]);
 
   const onErase = useCallback((id: string) => {
     dispatch({ type: "remove", id });
     setSelectedId((s) => (s === id ? null : s));
-  }, [setSelectedId]);
+  }, [dispatch, setSelectedId]);
 
   const onEditText = useCallback(
     (id: string) => {
@@ -211,7 +211,7 @@ export default function PranchetaPage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selectedId, onErase]);
+  }, [selectedId, onErase, dispatch]);
 
   const exportPng = () => {
     const url = stageRef.current?.toDataURL({ pixelRatio: 2 });
@@ -246,10 +246,37 @@ export default function PranchetaPage() {
           />
         </div>
         <div className={styles.actions}>
+          <SaveIndicator status={status} />
+          <Select
+            label="Estratégias salvas"
+            className={styles.picker}
+            value={playbook.id}
+            disabled={!ready}
+            options={(list.some((s) => s.id === playbook.id) ? list : [playbook, ...list]).map((s) => ({
+              value: s.id,
+              label: `${s.title.trim() || "Sem nome"} · ${findMap(s.mapId)?.name ?? "Mapa"}`,
+            }))}
+            onChange={(id) => {
+              setSelectedId(null);
+              void openById(id);
+            }}
+          />
+          <Button variant="ghost" icon="pencil" disabled={!ready} onClick={() => void createNew()}>
+            Nova
+          </Button>
+          <Button variant="ghost" icon="layers" disabled={!ready} onClick={() => void duplicate()}>
+            Duplicar
+          </Button>
           <Button variant="secondary" icon="save" onClick={exportPng}>
             Exportar PNG
           </Button>
+          <Button variant="primary" icon="share" disabled={!ready} onClick={() => void share()}>
+            Compartilhar com o elenco
+          </Button>
         </div>
+      </div>
+      <div role="status" aria-live="polite" className={cx(styles.notice, notice && styles.noticeOn)}>
+        {notice}
       </div>
 
       <div className={styles.body}>
@@ -408,5 +435,21 @@ export default function PranchetaPage() {
         </aside>
       </div>
     </div>
+  );
+}
+
+const STATUS_TEXT: Record<SaveStatus, string> = {
+  loading: "Abrindo",
+  saving: "Salvando",
+  saved: "Salvo",
+  error: "Não foi possível salvar neste navegador",
+};
+
+function SaveIndicator({ status }: { status: SaveStatus }) {
+  return (
+    <span className={cx(styles.saved, status === "error" && styles.savedError)} data-status={status}>
+      <Icon name={status === "error" ? "alert" : "save"} size={16} />
+      {STATUS_TEXT[status]}
+    </span>
   );
 }
