@@ -6,3 +6,4 @@
 .zoomBtn:hover { color: var(--bone); background: var(--ink-700); }
 .zoomBtn:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--focus); }
 .zoomValue { min-width: 40px; text-align: center; font: 600 13px/16px var(--font-display); letter-spacing: 0.04em; color: var(--bone-muted); }
+.stage { position: absolute; inset: 0; }

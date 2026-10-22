@@ -164,6 +164,7 @@ export function MapCanvas({
   return (
     <div className={styles.wrap}>
       <div ref={frame} className={cx(styles.frame, "st-cut")} style={{ cursor: panning ? "grabbing" : cursor }}>
+        <div className={styles.stage} role="img" aria-label={label}>
         {size > 0 ? (
           <Stage
             ref={stageRef}
@@ -174,8 +175,6 @@ export function MapCanvas({
             onPointerUp={handleUp}
             onWheel={handleWheel}
             onContextMenu={(e) => e.evt.preventDefault()}
-            role="img"
-            aria-label={label}
           >
             <Layer>
               <Group x={view.x} y={view.y} scaleX={view.zoom} scaleY={view.zoom}>
@@ -205,6 +204,7 @@ export function MapCanvas({
             </Layer>
           </Stage>
         ) : null}
+        </div>
         {size > 0 ? overlay?.(toScreen) : null}
         <div className={styles.zoom} role="group" aria-label="Zoom">
           <button type="button" className={styles.zoomBtn} onClick={() => zoomBy(1.4)} aria-label="Aproximar" title="Aproximar">
