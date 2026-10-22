@@ -1,2 +1,3 @@
+// Aviso exigido pela política de uso de propriedade intelectual da Riot (Legal Jibber Jabber), traduzido
 export const RIOT_DISCLAIMER =
-  "Sala Tática isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.";
+  "O Sala Tática não é endossado pela Riot Games e não reflete as visões ou opiniões da Riot Games nem de qualquer pessoa oficialmente envolvida na produção ou no gerenciamento das propriedades da Riot Games. Riot Games e todas as propriedades associadas são marcas comerciais ou marcas registradas da Riot Games, Inc.";
