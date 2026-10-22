@@ -1,0 +1,61 @@
+/* Sala Tática: tokens (fonte da verdade em design/tokens.json) */
+:root, [data-theme="dark"] {
+  --ink-900: #0F1923;
+  --ink-800: #16222E;
+  --ink-700: #1F2D3A;
+  --line: #2C3B49;
+  --line-strong: #5D6B79;
+  --bone: #ECE8E1;
+  --bone-muted: #9AA3AD;
+  --signal: #FF4655;
+  --signal-text: #FF4655;
+  --on-signal: #0F1923;
+  --cyan: #3CC8C8;
+  --gold: #E8B04B;
+  --ok: #5FC48A;
+  --focus: var(--signal-text);
+  --heat-0: var(--ink-800);
+  --heat-1: #3A3035;
+  --heat-2: #6B4536;
+  --heat-3: #A9623F;
+  --heat-4: #DC5A4A;
+  --heat-5: var(--signal);
+}
+[data-theme="light"] {
+  --ink-900: #ECE8E1;
+  --ink-800: #E3DED5;
+  --ink-700: #D7D1C6;
+  --line: #B9B2A6;
+  --line-strong: #857D72;
+  --bone: #0F1923;
+  --bone-muted: #4F5966;
+  --signal: #FF4655;
+  --signal-text: #B01A28;
+  --on-signal: #0F1923;
+  --cyan: #0E6B6C;
+  --gold: #76500A;
+  --ok: #1B6640;
+  --focus: var(--signal-text);
+  --heat-0: var(--ink-800);
+  --heat-1: #DCC6B2;
+  --heat-2: #D4A07C;
+  --heat-3: #DA7B57;
+  --heat-4: #EE5A4F;
+  --heat-5: var(--signal);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-none: 0;
+  --cut-corner: 8px;
+  --border-hairline: 1px;
+  --border-focus: 2px;
+  --stroke-icon: 1.5px;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-sans: Barlow, system-ui, sans-serif;
+}

@@ -1,0 +1,22 @@
+.shell { min-height: 100vh; display: flex; flex-direction: column; background: var(--ink-900); }
+.header { border-bottom: var(--border-hairline) solid var(--line); }
+.bar, .nav, .main, .footer { max-width: 1376px; width: 100%; margin: 0 auto; padding-left: var(--space-8); padding-right: var(--space-8); }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; min-height: 64px; }
+.brand {
+  display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--bone);
+  font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.brandMark { width: 10px; height: 10px; background: var(--signal); }
+.user { display: flex; align-items: center; gap: var(--space-3); font-weight: 500; }
+.nav { display: flex; gap: var(--space-1); overflow-x: auto; scrollbar-width: none; }
+.tab {
+  position: relative; display: inline-flex; align-items: center; height: 44px; padding: 0 var(--space-3);
+  white-space: nowrap; color: var(--bone-muted); text-decoration: none;
+  font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.tabActive { color: var(--bone); }
+.tabActive::after { content: ""; position: absolute; left: var(--space-3); right: var(--space-3); bottom: -1px; height: 2px; background: var(--signal); }
+.tabActive:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--focus); }
+.tabOff { opacity: 0.55; cursor: default; }
+.main { flex: 1; padding-top: var(--space-6); padding-bottom: var(--space-12); }
+.footer { padding-bottom: var(--space-8); font-size: 12px; line-height: 18px; color: var(--bone-muted); }

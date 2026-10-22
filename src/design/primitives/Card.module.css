@@ -1,0 +1,6 @@
+.card { background: var(--ink-800); padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.elevated { background: var(--ink-700); }
+.head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+.title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 24px; letter-spacing: 0.04em; text-transform: uppercase; }
+.actions { display: flex; gap: var(--space-2); }
+.body { color: var(--bone); }

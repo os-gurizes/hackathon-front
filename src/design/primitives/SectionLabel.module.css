@@ -1,0 +1,8 @@
+.section {
+  display: flex; align-items: center; gap: var(--space-2); margin: 0;
+  font-family: var(--font-display); font-weight: 600; font-size: 13px; line-height: 16px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted);
+}
+.mark { width: 6px; height: 6px; background: var(--signal); flex: none; }
+.num { color: var(--bone); }
+.rule { flex: 1; height: var(--border-hairline); background: var(--line); min-width: var(--space-6); }

@@ -1,0 +1,11 @@
+.badge {
+  display: inline-flex; align-items: center; gap: var(--space-1); height: 22px; padding: 0 var(--space-2);
+  font-family: var(--font-display); font-weight: 600; font-size: 13px; line-height: 16px;
+  letter-spacing: 0.08em; text-transform: uppercase; background: var(--ink-700); color: var(--bone); white-space: nowrap;
+}
+.attack { color: var(--signal-text); background: var(--ink-800); }
+.defense { color: var(--cyan); background: var(--ink-800); }
+.gold { color: var(--gold); background: var(--ink-800); }
+.ok { color: var(--ok); background: var(--ink-800); }
+.alert { color: var(--on-signal); background: var(--signal); }
+.estimate { background: transparent; color: var(--bone-muted); outline: var(--border-hairline) dashed var(--line-strong); outline-offset: -1px; }

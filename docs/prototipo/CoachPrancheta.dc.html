@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Prancheta</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/salatatica/tokens.css">
+<link rel="stylesheet" href="ds/salatatica/components/bundle.css">
+<script src="ds/salatatica/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:var(--ink-900);color:var(--bone);font-family:var(--font-sans)}
+a{color:var(--bone)}a:hover{color:var(--signal-text)}
+a.st-tab,a.st-btn{text-decoration:none}
+.st-tab.is-off{color:var(--bone-muted);opacity:.55;cursor:default}
+.mh{font:600 13px/16px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:var(--bone-muted)}
+.tool{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--bone-muted);cursor:pointer}
+.tool:hover{color:var(--bone);background:var(--ink-700)}
+.tool.on{background:var(--signal);color:var(--on-signal)}
+.tool:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus),inset 0 0 0 4px var(--ink-900)}
+.phase{display:flex;align-items:center;gap:10px;padding:10px 12px;background:transparent;border:0;color:var(--bone);text-align:left;cursor:pointer;width:100%;font:500 15px/22px var(--font-sans)}
+.phase.on{background:var(--ink-700)}
+.phase:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus)}
+.eye{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--bone-muted);cursor:pointer;flex:none}
+.eye.on{color:var(--bone)}
+.eye:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus)}
+.wall{position:absolute;box-shadow:inset 0 0 0 1px var(--line-strong);background:var(--ink-700)}
+.wall span{position:absolute;left:6px;top:4px;font:600 11px/14px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:var(--bone-muted)}
+.agent{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;padding:2px;box-sizing:border-box;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%)}
+.agent img{width:100%;height:100%;display:block;background:var(--ink-900)}
+.minimap{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--ink-900); display: flex; flex-direction: column;">
+  <header style="border-bottom: 1px solid var(--line); background: var(--ink-900);">
+    <div style="max-width: 1376px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; min-height: 64px;">
+      <a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <span style="width: 10px; height: 10px; background: var(--signal);"></span>
+        <span style="font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 0.04em; text-transform: uppercase;">Sala Tática</span>
+      </a>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <x-import component-from-global-scope="SalaTatica.Icon" name="team" size="{{s20}}"></x-import>
+        <span style="font-weight: 500;">Coach Marques</span>
+        <x-import component-from-global-scope="SalaTatica.Badge" tone="defense" icon="{{none}}">Coach</x-import>
+        <a href="Main.dc.html" class="st-btn st-cut st-btn--ghost st-btn--sm">Sair</a>
+      </div>
+    </div>
+    <nav aria-label="Visão do coach" style="max-width: 1376px; margin: 0 auto; padding: 0 32px;">
+      <div class="st-tabs" style="border-bottom: 0;">
+        <a href="CoachTime.dc.html" class="st-tab">Meu time</a>
+        <span class="st-tab is-off" title="Fora deste protótipo">Análise de partida</span>
+        <a href="CoachPrancheta.dc.html" class="st-tab is-active" aria-current="page">Prancheta</a>
+        <span class="st-tab is-off" title="Fora deste protótipo">Estratégias</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Elenco</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Pressão e rotações</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Combos</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Economia do time</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Scouting</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Heatmap</span>
+      </div>
+    </nav>
+  </header>
+
+  <div style="max-width: 1376px; width: 100%; margin: 0 auto; padding: 24px 32px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <span class="mh" style="display: flex; align-items: center; gap: 8px;"><img src="/_blob/fb8d4287993908c4bb9f23523afeb004" alt="" width="96" height="21" style="width: 96px; height: 21px; object-fit: cover;">Bind · Ataque</span>
+      <h1 style="margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 40px; line-height: 44px; letter-spacing: 0.04em; text-transform: uppercase;">Execução rápida no B</h1>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--bone-muted); margin-right: 8px;"><x-import component-from-global-scope="SalaTatica.Icon" name="save" size="{{s16}}"></x-import>Salvo</span>
+      <x-import component-from-global-scope="SalaTatica.Button" variant="ghost" icon="layers">Duplicar</x-import>
+      <x-import component-from-global-scope="SalaTatica.Button" variant="secondary" icon="save">Exportar PNG</x-import>
+      <x-import component-from-global-scope="SalaTatica.Button" variant="primary" icon="share">Compartilhar com o elenco</x-import>
+    </div>
+  </div>
+
+  <div style="max-width: 1376px; width: 100%; margin: 0 auto; padding: 0 32px 48px; box-sizing: border-box; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start;">
+    <div role="toolbar" aria-label="Ferramentas de desenho" aria-orientation="vertical" class="st-cut" style="background: var(--ink-800); padding: 6px; display: flex; flex-direction: column; gap: 2px;">
+      <sc-for list="{{tools}}" as="t" hint-placeholder-count="8">
+        <button type="button" class="{{t.cls}}" aria-label="{{t.label}}" title="{{t.label}}" aria-pressed="{{t.on}}" onClick="{{t.pick}}">
+          <x-import component-from-global-scope="SalaTatica.Icon" name="{{t.icon}}" size="{{s20}}"></x-import>
+        </button>
+      </sc-for>
+      <span style="height: 1px; background: var(--line); margin: 6px 4px;"></span>
+      <button type="button" class="tool" aria-label="Desfazer" title="Desfazer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" aria-hidden="true"><path d="M9 5L4 10l5 5"></path><path d="M4 10h11l4 4v5"></path></svg></button>
+      <button type="button" class="tool" aria-label="Refazer" title="Refazer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" aria-hidden="true"><path d="M15 5l5 5-5 5"></path><path d="M20 10H9l-4 4v5"></path></svg></button>
+    </div>
+
+    <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 8px;">
+      <div class="st-cut" style="position: relative; width: 100%; max-width: 760px; aspect-ratio: 1 / 1; background: var(--ink-800); overflow: hidden;">
+        <img class="minimap" src="/_blob/7c00be43bd8ae82645b64469d3b403b1" alt="Minimapa da Bind" style="{{mapStyle}}">
+        <sc-if value="{{showHeat}}" hint-placeholder-val="{{false}}">
+          <sc-for list="{{heat}}" as="h" hint-placeholder-count="12">
+            <div style="{{h.style}}"></div>
+          </sc-for>
+        </sc-if>
+        <svg viewBox="0 0 1000 1000" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <sc-for list="{{areas}}" as="a" hint-placeholder-count="2">
+            <path d="{{a.d}}" style="{{a.style}}"></path>
+          </sc-for>
+          <sc-for list="{{arrows}}" as="r" hint-placeholder-count="5">
+            <path d="{{r.d}}" style="{{r.style}}"></path>
+            <path d="{{r.head}}" style="{{r.headStyle}}"></path>
+          </sc-for>
+        </svg>
+        <sc-if value="{{showCallouts}}" hint-placeholder-val="{{true}}">
+          <sc-for list="{{callouts}}" as="c" hint-placeholder-count="8">
+            <div style="{{c.style}}">{{c.name}}</div>
+          </sc-for>
+        </sc-if>
+        <sc-for list="{{agents}}" as="g" hint-placeholder-count="5">
+          <div class="agent" style="{{g.style}}" title="{{g.name}}"><img src="{{g.img}}" alt="{{g.name}}"></div>
+        </sc-for>
+        <sc-for list="{{labels}}" as="l" hint-placeholder-count="2">
+          <div style="{{l.style}}">{{l.text}}</div>
+        </sc-for>
+      </div>
+      <span style="font-size: 13px; line-height: 18px; color: var(--bone-muted);">Ferramenta ativa: {{toolName}}. Fase em edição: {{phaseName}}.</span>
+    </div>
+
+    <aside style="flex: 1 1 300px; min-width: 280px; display: flex; flex-direction: column; gap: 16px;">
+      <div class="st-cut" style="background: var(--ink-800); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n1}}" as="div">Fases</x-import>
+        <sc-for list="{{phases}}" as="p" hint-placeholder-count="4">
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button type="button" class="{{p.cls}}" aria-pressed="{{p.active}}" onClick="{{p.pick}}">
+              <span style="{{p.swatch}}"></span>
+              <span style="flex: 1;">{{p.name}}</span>
+              <span style="font-size: 13px; color: var(--bone-muted);">{{p.count}}</span>
+            </button>
+            <button type="button" class="{{p.eyeCls}}" aria-label="{{p.eyeLabel}}" aria-pressed="{{p.visible}}" onClick="{{p.toggle}}">
+              <x-import component-from-global-scope="SalaTatica.Icon" name="{{p.eyeIcon}}" size="{{s16}}"></x-import>
+            </button>
+          </div>
+        </sc-for>
+        <x-import component-from-global-scope="SalaTatica.Button" variant="secondary" size="sm" icon="play" style="align-self: flex-start; margin-top: 8px;">Apresentar fases</x-import>
+      </div>
+
+      <div class="st-cut" style="background: var(--ink-800); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n2}}" as="div">Fundo</x-import>
+        <div role="group" aria-label="Fundo do mapa" style="display: flex; flex-direction: column; gap: 2px;">
+          <sc-for list="{{bgs}}" as="b" hint-placeholder-count="3">
+            <button type="button" class="{{b.cls}}" aria-pressed="{{b.on}}" onClick="{{b.pick}}">{{b.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div class="st-cut" style="background: var(--ink-800); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n3}}" as="div">Notas da fase</x-import>
+        <p style="margin: 0; font-size: 15px; line-height: 22px;">{{phaseNote}}</p>
+      </div>
+    </aside>
+  </div>
+  <footer style="max-width: 1376px; width: 100%; margin: 0 auto; padding: 0 32px 32px; box-sizing: border-box; font-size: 12px; line-height: 18px; color: var(--bone-muted);">Sala Tática isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { tool: 'arrow', phase: 'exec', visible: { setup: true, exec: true, post: true, retake: false }, bg: 'zones' };
+  }
+  renderVals() {
+    const s = this.state;
+    const tools = [
+      { id: 'pencil', label: 'Caneta livre', icon: 'pencil' },
+      { id: 'arrow', label: 'Seta', icon: 'arrow' },
+      { id: 'zone', label: 'Área', icon: 'zone' },
+      { id: 'player', label: 'Marcador de agente', icon: 'player' },
+      { id: 'text', label: 'Texto', icon: 'layers' },
+      { id: 'eraser', label: 'Borracha', icon: 'eraser' }
+    ];
+    const phaseDef = [
+      { id: 'setup', name: 'Setup', color: 'var(--bone-muted)', note: 'Todos começam na base. Smoke e drone prontos para o B.' },
+      { id: 'exec', name: 'Execução', color: 'var(--signal)', note: 'Entrada em até 15 segundos. Duelista abre pelo B curto, iniciador limpa o fundo com drone.' },
+      { id: 'post', name: 'Pós-plant', color: 'var(--gold)', note: 'Plant no centro do site. Dois seguram a rotação, um segura o B longo.' },
+      { id: 'retake', name: 'Retake', color: 'var(--cyan)', note: 'Se perder o site, reagrupar no B longo e voltar junto.' }
+    ];
+    const IMG = { jett: '/_blob/289036feb5c208e7d027a3f6d5c28e48', raze: '/_blob/d93aa081152f827f6c74601ba27fbdc9', sova: '/_blob/b6f1efb8691fe8e8c1e50aac6baeb8c4', omen: '/_blob/16be5e58854af7e0d1bcd7655101b66b', killjoy: '/_blob/e30bd4a1738c357defb4a8fe36505a80' };
+    const NAME = { jett: 'Jett', raze: 'Raze', sova: 'Sova', omen: 'Omen', killjoy: 'Killjoy' };
+    // Coordenadas 0..1 sobre o minimapa da Bind (callouts reais do pacote de assets).
+    const calloutsDef = [['B Site', 0.2919, 0.3122], ['B Long', 0.1927, 0.5152], ['B Window', 0.3227, 0.4468], ['B Short', 0.3966, 0.5295], ['B Hall', 0.2854, 0.2016], ['A Site', 0.7341, 0.3334], ['A Short', 0.6244, 0.4965], ['Cave', 0.5921, 0.7363], ['Spawn de ataque', 0.5815, 0.958], ['Spawn de defesa', 0.5169, 0.1037]];
+    const drawings = {
+      setup: { arrows: [[[0.57, 0.92], [0.29, 0.66]], [[0.60, 0.91], [0.59, 0.77]]], areas: [], agents: [[0.54, 0.90, 'jett'], [0.58, 0.88, 'raze'], [0.62, 0.90, 'sova'], [0.56, 0.94, 'omen'], [0.61, 0.94, 'killjoy']] },
+      exec: { arrows: [[[0.26, 0.61], [0.20, 0.50]], [[0.20, 0.49], [0.26, 0.35]], [[0.37, 0.56], [0.33, 0.46]]], areas: [[0.29, 0.21, 0.05], [0.40, 0.42, 0.045]], agents: [[0.21, 0.46, 'jett'], [0.36, 0.53, 'raze'], [0.25, 0.58, 'sova'], [0.30, 0.66, 'omen']] },
+      post: { arrows: [[[0.42, 0.59], [0.55, 0.52]]], areas: [[0.29, 0.31, 0.06]], agents: [[0.28, 0.22, 'jett'], [0.25, 0.42, 'omen'], [0.19, 0.53, 'sova'], [0.41, 0.58, 'killjoy']] },
+      retake: { arrows: [[[0.42, 0.59], [0.33, 0.39]], [[0.26, 0.62], [0.22, 0.40]]], areas: [], agents: [] }
+    };
+    const P = (v) => (v * 1000).toFixed(1);
+    const oct = (cx, cy, r) => { const k = r * 0.41; return [[cx - k, cy - r], [cx + k, cy - r], [cx + r, cy - k], [cx + r, cy + k], [cx + k, cy + r], [cx - k, cy + r], [cx - r, cy + k], [cx - r, cy - k]]; };
+    const arrows = [], areas = [], agents = [], labels = [];
+    phaseDef.forEach((p) => {
+      if (!s.visible[p.id]) return;
+      const d = drawings[p.id];
+      const dim = s.phase !== p.id ? 'opacity:.5;' : '';
+      d.arrows.forEach(([a, b]) => {
+        const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), L = 0.022;
+        const h1 = [b[0] - L * Math.cos(ang - 0.5), b[1] - L * Math.sin(ang - 0.5)];
+        const h2 = [b[0] - L * Math.cos(ang + 0.5), b[1] - L * Math.sin(ang + 0.5)];
+        const st = 'fill:none;stroke:' + p.color + ';stroke-width:5;stroke-linecap:square;' + dim;
+        arrows.push({ d: 'M' + P(a[0]) + ' ' + P(a[1]) + 'L' + P(b[0]) + ' ' + P(b[1]), style: st,
+          head: 'M' + P(h1[0]) + ' ' + P(h1[1]) + 'L' + P(b[0]) + ' ' + P(b[1]) + 'L' + P(h2[0]) + ' ' + P(h2[1]), headStyle: st });
+      });
+      d.areas.forEach(([cx, cy, r]) => areas.push({ d: 'M' + oct(cx, cy, r).map((q) => P(q[0]) + ' ' + P(q[1])).join('L') + 'Z', style: 'fill:color-mix(in srgb, ' + p.color + ' 30%, transparent);stroke:' + p.color + ';stroke-width:2;stroke-dasharray:8 6;' + dim }));
+      d.agents.forEach(([x, y, ag]) => agents.push({ img: IMG[ag], name: p.name + ': ' + NAME[ag], style: 'left:' + (x * 100) + '%;top:' + (y * 100) + '%;background:' + p.color + ';' + dim }));
+    });
+    if (s.visible.post) labels.push({ text: 'Plant aqui', style: 'position:absolute;left:33%;top:30%;font:600 12px/16px var(--font-display);letter-spacing:.08em;text-transform:uppercase;background:var(--ink-900);color:var(--gold);padding:2px 6px;' });
+    const heat = [];
+    if (s.bg === 'heat') {
+      [[0.29, 0.31, 5], [0.22, 0.47, 4], [0.33, 0.45, 3], [0.29, 0.21, 3], [0.62, 0.50, 2], [0.73, 0.33, 1]].forEach(([x, y, k]) => {
+        heat.push({ style: 'position:absolute;left:' + ((x - 0.06) * 100) + '%;top:' + ((y - 0.06) * 100) + '%;width:12%;height:12%;background:var(--heat-' + k + ');opacity:.7;mix-blend-mode:screen;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);' });
+      });
+    }
+    const callouts = calloutsDef.map(([name, x, y]) => ({ name, style: 'position:absolute;left:' + (x * 100) + '%;top:' + (y * 100) + '%;transform:translate(-50%,-50%);font:600 10px/12px var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--bone);background:var(--ink-900);padding:2px 4px;white-space:nowrap;pointer-events:none;opacity:.85;' }));
+    const bgDef = [{ id: 'silhouette', label: 'Só o minimapa' }, { id: 'zones', label: 'Minimapa com callouts' }, { id: 'heat', label: 'Heatmap do adversário' }];
+    const cur = phaseDef.find((p) => p.id === s.phase);
+    const toolCur = tools.find((t) => t.id === s.tool);
+    return {
+      none: null, s16: 16, s20: 20, n1: 1, n2: 2, n3: 3,
+      tools: tools.map((t) => ({ ...t, on: s.tool === t.id, cls: 'tool' + (s.tool === t.id ? ' on' : ''), pick: () => this.setState({ tool: t.id }) })),
+      phases: phaseDef.map((p) => ({
+        name: p.name, active: s.phase === p.id, visible: !!s.visible[p.id],
+        count: (drawings[p.id].arrows.length + drawings[p.id].areas.length + drawings[p.id].agents.length) + ' itens',
+        cls: 'phase' + (s.phase === p.id ? ' on' : ''),
+        swatch: 'width:12px;height:12px;flex:none;background:' + p.color + ';',
+        eyeCls: 'eye' + (s.visible[p.id] ? ' on' : ''),
+        eyeIcon: s.visible[p.id] ? 'layers' : 'close',
+        eyeLabel: (s.visible[p.id] ? 'Esconder ' : 'Mostrar ') + p.name,
+        pick: () => this.setState({ phase: p.id, visible: { ...s.visible, [p.id]: true } }),
+        toggle: () => this.setState({ visible: { ...s.visible, [p.id]: !s.visible[p.id] } })
+      })),
+      bgs: bgDef.map((b) => ({ ...b, on: s.bg === b.id, cls: 'phase' + (s.bg === b.id ? ' on' : ''), pick: () => this.setState({ bg: b.id }) })),
+      showHeat: s.bg === 'heat', heat,
+      showCallouts: s.bg === 'zones', callouts,
+      mapStyle: 'filter:brightness(' + (s.bg === 'heat' ? '.35' : '.5') + ') contrast(1.1);',
+      arrows, areas, agents, labels,
+      toolName: toolCur.label, phaseName: cur.name, phaseNote: cur.note
+    };
+  }
+}
+</script>
+</body>
+</html>

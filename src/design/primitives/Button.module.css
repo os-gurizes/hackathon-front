@@ -1,0 +1,19 @@
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  height: 40px; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-none);
+  font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 16px;
+  letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+  transition: background-color 140ms ease-out, color 140ms ease-out;
+}
+.sm { height: 32px; padding: 0 var(--space-3); font-size: 13px; }
+.primary { background: var(--signal); color: var(--on-signal); }
+.primary:hover { background: var(--heat-4); }
+.secondary { background: var(--ink-700); color: var(--bone); }
+.secondary:hover { background: var(--line); }
+.ghost { background: transparent; color: var(--bone-muted); }
+.ghost:hover { color: var(--bone); background: var(--ink-800); }
+.btn:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--focus), inset 0 0 0 4px var(--ink-900); }
+.iconOnly { width: 40px; padding: 0; }
+.iconOnly.sm { width: 32px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }

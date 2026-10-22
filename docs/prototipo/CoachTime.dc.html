@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Meu time</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/salatatica/tokens.css">
+<link rel="stylesheet" href="ds/salatatica/components/bundle.css">
+<script src="ds/salatatica/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:var(--ink-900);color:var(--bone);font-family:var(--font-sans)}
+a{color:var(--bone)}a:hover{color:var(--signal-text)}
+a.st-tab,a.st-btn{text-decoration:none}
+.st-tab.is-off{color:var(--bone-muted);opacity:.55;cursor:default}
+.mh{font:600 13px/16px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:var(--bone-muted)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--ink-900);">
+  <header style="border-bottom: 1px solid var(--line); background: var(--ink-900);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; min-height: 64px;">
+      <a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <span style="width: 10px; height: 10px; background: var(--signal);"></span>
+        <span style="font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 0.04em; text-transform: uppercase;">Sala Tática</span>
+      </a>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <x-import component-from-global-scope="SalaTatica.Badge" tone="estimate" icon="{{none}}">Dados de exemplo</x-import>
+        <x-import component-from-global-scope="SalaTatica.Icon" name="team" size="{{s20}}"></x-import>
+        <span style="font-weight: 500;">Coach Marques</span>
+        <x-import component-from-global-scope="SalaTatica.Badge" tone="defense" icon="{{none}}">Coach</x-import>
+        <a href="Main.dc.html" class="st-btn st-cut st-btn--ghost st-btn--sm">Sair</a>
+      </div>
+    </div>
+    <nav aria-label="Visão do coach" style="max-width: 1280px; margin: 0 auto; padding: 0 32px;">
+      <div class="st-tabs" style="border-bottom: 0;">
+        <a href="CoachTime.dc.html" class="st-tab is-active" aria-current="page">Meu time</a>
+        <span class="st-tab is-off" title="Fora deste protótipo">Análise de partida</span>
+        <a href="CoachPrancheta.dc.html" class="st-tab">Prancheta</a>
+        <span class="st-tab is-off" title="Fora deste protótipo">Estratégias</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Elenco</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Pressão e rotações</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Combos</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Economia do time</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Scouting</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Heatmap</span>
+      </div>
+    </nav>
+  </header>
+
+  <main style="max-width: 1280px; margin: 0 auto; padding: 32px 32px 64px; display: flex; flex-direction: column; gap: 32px; box-sizing: border-box;">
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;">
+      <x-import component-from-global-scope="SalaTatica.Select" label="Campeonato" options="{{campeonatos}}" default-value="liga"></x-import>
+      <x-import component-from-global-scope="SalaTatica.Select" label="Período" options="{{periodos}}" default-value="20"></x-import>
+    </div>
+
+    <section style="display: flex; flex-direction: column; gap: 24px;">
+      <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n1}}">Panorama</x-import>
+      <p style="margin: 0; max-width: 880px; font-size: 28px; line-height: 36px; font-weight: 500;">O time vence 6 de cada 10 partidas, mas perde a Bind no ataque com frequência: 3 vitórias em 9 partidas.</p>
+      <div class="st-cut" style="background: var(--ink-800); padding: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; align-items: start;">
+        <x-import component-from-global-scope="SalaTatica.Stat" label="Win rate" value="61" unit="%" delta="+7 p.p." comparison="contra a etapa passada"></x-import>
+        <x-import component-from-global-scope="SalaTatica.Stat" label="Rounds de ataque" value="47" unit="%" delta="-3 p.p." comparison="contra a média do campeonato"></x-import>
+        <x-import component-from-global-scope="SalaTatica.Stat" label="Rounds de defesa" value="56" unit="%" delta="+5 p.p." comparison="contra a média do campeonato"></x-import>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span class="mh">Forma recente</span>
+          <div style="display: flex; gap: 4px;" role="img" aria-label="Últimas 10 partidas: {{formaTexto}}">
+            <sc-for list="{{forma}}" as="f" hint-placeholder-count="10">
+              <span style="{{f.style}}">{{f.letra}}</span>
+            </sc-for>
+          </div>
+          <span style="font-size: 13px; line-height: 18px; color: var(--bone-muted);">7 vitórias nas últimas 10 partidas. Mais recente à direita.</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 24px;">
+      <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n2}}">Win rate por mapa e lado</x-import>
+      <div class="st-cut" style="background: var(--ink-800); padding: 24px; overflow-x: auto;">
+        <div style="display: grid; grid-template-columns: minmax(120px, 1.2fr) repeat(3, minmax(120px, 1fr)) minmax(100px, 0.8fr); gap: 4px; min-width: 640px;">
+          <span class="mh" style="padding: 8px 0;">Mapa</span>
+          <span class="mh" style="padding: 8px 12px; display: flex; align-items: center; gap: 6px; color: var(--signal-text);"><x-import component-from-global-scope="SalaTatica.Icon" name="attack" size="{{s16}}"></x-import>Ataque</span>
+          <span class="mh" style="padding: 8px 12px; display: flex; align-items: center; gap: 6px; color: var(--cyan);"><x-import component-from-global-scope="SalaTatica.Icon" name="defense" size="{{s16}}"></x-import>Defesa</span>
+          <span class="mh" style="padding: 8px 12px;">Partidas</span>
+          <span class="mh" style="padding: 8px 12px; text-align: right;">Amostra</span>
+          <sc-for list="{{matriz}}" as="m" hint-placeholder-count="5">
+            <span style="position: relative; overflow: hidden; display: flex; align-items: center; padding: 12px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: 0.04em; text-transform: uppercase; background: var(--ink-900);"><img src="{{m.img}}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(.45);"><span style="position: relative;">{{m.mapa}}</span></span>
+            <span style="{{m.atkStyle}}">{{m.atk}}</span>
+            <span style="{{m.defStyle}}">{{m.def}}</span>
+            <span style="{{m.totStyle}}">{{m.tot}}</span>
+            <span style="padding: 12px; text-align: right; font-size: 13px; color: var(--bone-muted);">{{m.n}}</span>
+          </sc-for>
+        </div>
+        <p style="margin: 16px 0 0; font-size: 13px; line-height: 18px; color: var(--bone-muted);">Cor mais forte = taxa mais distante de 50%. Vermelho abaixo de 50%, ciano acima. Mapas com menos de 5 partidas ficam esmaecidos.</p>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 24px;">
+      <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n3}}">Alertas do time</x-import>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+        <sc-for list="{{alertas}}" as="a" hint-placeholder-count="3">
+          <div class="st-cut" style="background: var(--ink-800); padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <x-import component-from-global-scope="SalaTatica.Badge" tone="alert" icon="alert">{{a.tag}}</x-import>
+              <sc-if value="{{a.estimate}}" hint-placeholder-val="{{false}}">
+                <x-import component-from-global-scope="SalaTatica.Badge" tone="estimate">Estimativa</x-import>
+              </sc-if>
+            </div>
+            <h3 style="margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 24px; letter-spacing: 0.04em; text-transform: uppercase;">{{a.titulo}}</h3>
+            <p style="margin: 0; font-size: 15px; line-height: 22px;">{{a.texto}}</p>
+            <p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--bone-muted);">{{a.custo}}</p>
+            <a href="CoachPrancheta.dc.html" class="st-btn st-cut st-btn--secondary st-btn--sm" style="align-self: flex-start; margin-top: 4px;">Abrir na prancheta</a>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    <footer style="padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; line-height: 18px; color: var(--bone-muted); max-width: 900px;">Sala Tática isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</footer>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const cell = (v, n) => {
+      const dist = Math.min(1, Math.abs(v - 50) / 25);
+      const pct = Math.round(25 + dist * 60);
+      const col = v >= 50 ? 'var(--cyan)' : 'var(--signal)';
+      const fade = n < 5 ? 'opacity:.45;' : '';
+      return 'padding:12px;font:700 22px/24px var(--font-display);font-variant-numeric:tabular-nums;color:var(--bone);background:color-mix(in srgb, ' + col + ' ' + pct + '%, var(--ink-800));' + fade;
+    };
+    const rows = [
+      ['Ascent', 58, 63, 67, 12], ['Bind', 34, 52, 33, 9], ['Lotus', 49, 60, 57, 7], ['Haven', 55, 51, 60, 5], ['Split', 61, 70, 75, 4]
+    ];
+    const IMG = { Ascent: '/_blob/97501a56e0cfef19431be70ae20fc90e', Bind: '/_blob/fb8d4287993908c4bb9f23523afeb004', Lotus: '/_blob/45613fcc874cce1aec00ccc3b5094f6e', Haven: '/_blob/70f9dc6d1ae75c037d4577cbc6ee2e33', Split: '/_blob/8f3a1728c03f198d42289e513fb5bcc1' };
+    const res = ['V', 'V', 'D', 'V', 'V', 'D', 'V', 'V', 'D', 'V'];
+    return {
+      none: null, s16: 16, s20: 20, n1: 1, n2: 2, n3: 3,
+      campeonatos: [{ value: 'liga', label: 'Liga Universitária, etapa 6' }, { value: 'copa', label: 'Copa Regional' }],
+      periodos: [{ value: '20', label: 'Últimas 20 partidas' }, { value: '10', label: 'Últimas 10 partidas' }, { value: 'all', label: 'Todo o campeonato' }],
+      forma: res.map((r) => ({ letra: r, style: 'width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font:700 14px/1 var(--font-display);' + (r === 'V' ? 'background:var(--cyan);color:var(--ink-900);' : 'background:transparent;color:var(--signal-text);box-shadow:inset 0 0 0 1.5px var(--signal-text);') })),
+      formaTexto: res.map((r) => (r === 'V' ? 'vitória' : 'derrota')).join(', '),
+      matriz: rows.map(([mapa, atk, def, tot, n]) => ({
+        mapa, img: IMG[mapa], atk: atk + '%', def: def + '%', tot: tot + '%', n: n + (n < 5 ? ' (pouco)' : ''),
+        atkStyle: cell(atk, n), defStyle: cell(def, n), totStyle: cell(tot, n)
+      })),
+      alertas: [
+        { tag: 'Rotação', titulo: 'Rotação cedo na defesa da Bind', texto: 'Em 11 rounds o time girou do B para o A antes de qualquer informação. O ataque plantou no B em 8 deles.', custo: 'Custou cerca de 1,2 round por partida.', estimate: false },
+        { tag: 'Economia', titulo: 'Compra forçada depois do pistol', texto: 'Depois de perder o pistol, o time forçou compra em 7 de 9 partidas e venceu 2 desses rounds.', custo: 'Custou cerca de 0,8 round por partida.', estimate: false },
+        { tag: 'Habilidades', titulo: 'Smokes sem execução no meio', texto: 'Smokes no meio que não viram entrada em até 10 segundos aparecem em 1 de cada 5 rounds de ataque.', custo: 'O jogo não registra quando cada habilidade foi usada. Este número é calculado a partir de abates e assistências.', estimate: true }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

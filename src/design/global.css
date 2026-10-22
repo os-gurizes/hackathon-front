@@ -1,0 +1,24 @@
+@import "@fontsource/barlow/400.css";
+@import "@fontsource/barlow/500.css";
+@import "@fontsource/barlow-condensed/600.css";
+@import "@fontsource/barlow-condensed/700.css";
+@import "./tokens.css";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { background: var(--ink-900); color: var(--bone); }
+body {
+  margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 22px;
+  font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
+}
+a { color: var(--bone); }
+a:hover { color: var(--signal-text); }
+button { font: inherit; }
+
+/* Recorte em 45 graus, sempre no canto superior direito */
+.st-cut { clip-path: polygon(0 0, calc(100% - var(--cut-corner)) 0, 100% var(--cut-corner), 100% 100%, 0 100%); }
+
+.st-visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Meus mapas</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/salatatica/tokens.css">
+<link rel="stylesheet" href="ds/salatatica/components/bundle.css">
+<script src="ds/salatatica/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:var(--ink-900);color:var(--bone);font-family:var(--font-sans)}
+a{color:var(--bone)}a:hover{color:var(--signal-text)}
+a.st-tab,a.st-btn{text-decoration:none}
+.st-tab.is-off{color:var(--bone-muted);opacity:.55;cursor:default}
+.seg{height:36px;padding:0 14px;border:0;background:transparent;color:var(--bone-muted);font:600 13px/16px var(--font-display);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.seg.on{background:var(--ink-700);color:var(--bone)}
+.seg:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus)}
+.minimap{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:brightness(.42) contrast(1.1);pointer-events:none}
+.cell{position:absolute;pointer-events:none;mix-blend-mode:screen}
+.callout{position:absolute;transform:translate(-50%,-50%);border:0;cursor:pointer;padding:3px 6px;font:600 11px/14px var(--font-display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;background:var(--ink-900);color:var(--bone);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.callout:hover{box-shadow:inset 0 0 0 1px var(--bone)}
+.callout.sel{background:var(--bone);color:var(--ink-900)}
+.callout:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus)}
+.side{position:absolute;font:600 11px/14px var(--font-display);letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;display:flex;align-items:center;gap:4px;background:var(--ink-900)}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: var(--ink-900);">
+  <header style="border-bottom: 1px solid var(--line); background: var(--ink-900);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; min-height: 64px;">
+      <a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <span style="width: 10px; height: 10px; background: var(--signal);"></span>
+        <span style="font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 0.04em; text-transform: uppercase;">Sala Tática</span>
+      </a>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <x-import component-from-global-scope="SalaTatica.Badge" tone="estimate" icon="{{none}}">Dados de exemplo</x-import>
+        <img src="/_blob/7c3a455ffa01197e8a55dcfc5703f84b" alt="Elo Diamante 1" width="28" height="28" style="width: 28px; height: 28px;">
+        <span style="font-weight: 500;">Bruma</span>
+        <x-import component-from-global-scope="SalaTatica.Badge">Player</x-import>
+        <a href="Main.dc.html" class="st-btn st-cut st-btn--ghost st-btn--sm">Sair</a>
+      </div>
+    </div>
+    <nav aria-label="Visão do player" style="max-width: 1280px; margin: 0 auto; padding: 0 32px;">
+      <div class="st-tabs" style="border-bottom: 0;">
+        <a href="PlayerDesempenho.dc.html" class="st-tab">Meu desempenho</a>
+        <a href="PlayerMapas.dc.html" class="st-tab is-active" aria-current="page">Meus mapas</a>
+        <span class="st-tab is-off" title="Fora deste protótipo">Meus padrões</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Sob pressão</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Armas</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Agentes</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Economia</span>
+        <span class="st-tab is-off" title="Fora deste protótipo">Partidas</span>
+      </div>
+    </nav>
+  </header>
+
+  <main style="max-width: 1280px; margin: 0 auto; padding: 32px 32px 48px; display: flex; flex-direction: column; gap: 32px; box-sizing: border-box;">
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;">
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;">
+        <x-import component-from-global-scope="SalaTatica.Select" label="Mapa" options="{{mapas}}" default-value="ascent"></x-import>
+        <x-import component-from-global-scope="SalaTatica.Select" label="Lado" options="{{lados}}" default-value="atk"></x-import>
+        <x-import component-from-global-scope="SalaTatica.Select" label="Agente" options="{{agentes}}" default-value="omen"></x-import>
+      </div>
+      <div role="group" aria-label="O que o heatmap mostra" style="display: flex; gap: 4px; background: var(--ink-800); padding: 4px;">
+        <sc-for list="{{modeBtns}}" as="m" hint-placeholder-count="4">
+          <button type="button" class="{{m.cls}}" aria-pressed="{{m.on}}" onClick="{{m.pick}}">{{m.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <section style="display: flex; flex-direction: column; gap: 24px;">
+      <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n1}}">Heatmap pessoal</x-import>
+      <p style="margin: 0; max-width: 860px; font-size: 28px; line-height: 36px; font-weight: 500;">{{insight}}</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+        <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+          <div class="st-cut" style="position: relative; width: 100%; max-width: 760px; aspect-ratio: 1 / 1; background: var(--ink-800); overflow: hidden;">
+            <img class="minimap" src="/_blob/9597738f1c48581604fabcf2c339b730" alt="Minimapa da Ascent">
+            <sc-for list="{{cells}}" as="c" hint-placeholder-count="40">
+              <div class="cell" style="{{c.style}}"></div>
+            </sc-for>
+            <div class="side" style="right: 8px; bottom: 8px; color: var(--signal-text);"><x-import component-from-global-scope="SalaTatica.Icon" name="attack" size="{{s14}}"></x-import>Spawn de ataque à direita</div>
+            <div class="side" style="left: 8px; bottom: 8px; color: var(--cyan);"><x-import component-from-global-scope="SalaTatica.Icon" name="defense" size="{{s14}}"></x-import>Defesa à esquerda</div>
+            <sc-for list="{{zones}}" as="z" hint-placeholder-count="10">
+              <button type="button" class="{{z.cls}}" style="{{z.style}}" aria-pressed="{{z.on}}" onClick="{{z.pick}}">{{z.name}}</button>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; max-width: 760px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; color: var(--bone-muted);">
+              <span>{{legendLow}}</span>
+              <sc-for list="{{legend}}" as="l" hint-placeholder-count="6">
+                <span style="{{l.style}}"></span>
+              </sc-for>
+              <span>{{legendHigh}}</span>
+            </div>
+            <span style="font-size: 13px; line-height: 18px; color: var(--bone-muted);">9 partidas de Omen, 104 rounds de ataque.</span>
+          </div>
+        </div>
+
+        <div style="flex: 1 1 340px; min-width: 300px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="st-cut" style="background: var(--ink-800); padding: 16px; display: flex; align-items: center; gap: 12px;">
+            <img src="/_blob/16be5e58854af7e0d1bcd7655101b66b" alt="" width="40" height="40" style="width: 40px; height: 40px; background: var(--ink-700);">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted);">Filtrando por agente</span>
+              <span style="font-weight: 500;">Omen, controlador</span>
+            </div>
+          </div>
+          <sc-if value="{{hasZone}}" hint-placeholder-val="{{true}}">
+            <x-import component-from-global-scope="SalaTatica.Drawer" open="{{yes}}" inline="{{yes}}" title="{{zone.name}}" on-close="{{clearZone}}">
+              <p style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 500;">{{zone.summary}}</p>
+              <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+                <x-import component-from-global-scope="SalaTatica.Stat" label="Abates" value="{{zone.kills}}" comparison="em 9 partidas"></x-import>
+                <x-import component-from-global-scope="SalaTatica.Stat" label="Mortes" value="{{zone.deaths}}" delta="{{zone.deathsDelta}}" delta-tone="{{zone.deathsTone}}" comparison="contra a média do mapa"></x-import>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <span style="font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted);">Rounds de exemplo</span>
+                <sc-for list="{{zone.rounds}}" as="r" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line);">
+                    <x-import component-from-global-scope="SalaTatica.Icon" name="play" size="{{s16}}"></x-import>
+                    <span style="flex: 1;">{{r.label}}</span>
+                    <span style="color: var(--bone-muted); font-size: 13px;">{{r.result}}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </x-import>
+          </sc-if>
+          <sc-if value="{{noZone}}" hint-placeholder-val="{{false}}">
+            <div class="st-cut" style="background: var(--ink-800); padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+              <x-import component-from-global-scope="SalaTatica.Icon" name="zone"></x-import>
+              <p style="margin: 0; font-size: 15px; line-height: 22px;">Clique num callout do mapa para ver o resumo da zona e os rounds de exemplo.</p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <x-import component-from-global-scope="SalaTatica.SectionLabel" index="{{n2}}">Zonas em tabela</x-import>
+      <x-import component-from-global-scope="SalaTatica.Table" columns="{{tableCols}}" rows="{{tableRows}}" highlight="{{selectedId}}" caption="A mesma leitura do heatmap, zona por zona, no lado de ataque."></x-import>
+    </section>
+
+    <footer style="padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; line-height: 18px; color: var(--bone-muted); max-width: 900px;">Sala Tática isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</footer>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { mode: 'mortes', zone: 'mid-top' }; }
+  renderVals() {
+    // Callouts reais da Ascent (posições 0..1 no minimapa) com números de exemplo.
+    const zonesDef = [
+      { id: 'a-lobby', name: 'A Lobby', x: 0.6029, y: 0.259, kills: 3, deaths: 2, avgD: 3, pres: 0.8 },
+      { id: 'a-main', name: 'A Main', x: 0.4842, y: 0.2007, kills: 5, deaths: 6, avgD: 5, pres: 0.7 },
+      { id: 'a-site', name: 'A Site', x: 0.3501, y: 0.1425, kills: 11, deaths: 4, avgD: 6, pres: 0.5 },
+      { id: 'a-tree', name: 'A Tree', x: 0.3982, y: 0.2946, kills: 4, deaths: 3, avgD: 3, pres: 0.3 },
+      { id: 'mid-top', name: 'Mid Top', x: 0.6648, y: 0.3805, kills: 2, deaths: 9, avgD: 4, pres: 0.9 },
+      { id: 'mid-catwalk', name: 'Mid Catwalk', x: 0.525, y: 0.4111, kills: 2, deaths: 5, avgD: 3, pres: 0.6 },
+      { id: 'mid-courtyard', name: 'Mid Courtyard', x: 0.4928, y: 0.4877, kills: 1, deaths: 3, avgD: 2, pres: 0.4 },
+      { id: 'b-lobby', name: 'B Lobby', x: 0.7166, y: 0.6776, kills: 1, deaths: 1, avgD: 2, pres: 0.4 },
+      { id: 'b-main', name: 'B Main', x: 0.405, y: 0.7121, kills: 4, deaths: 3, avgD: 4, pres: 0.4 },
+      { id: 'b-site', name: 'B Site', x: 0.2855, y: 0.7373, kills: 5, deaths: 2, avgD: 3, pres: 0.3 }
+    ];
+    const mode = this.state.mode;
+    const weight = (z) => mode === 'presenca' ? z.pres : mode === 'abates' ? z.kills / 11 : mode === 'mortes' ? z.deaths / 9 : 0;
+    const N = 40, cells = [];
+    if (mode !== 'kd') {
+      for (let gy = 0; gy < N; gy++) for (let gx = 0; gx < N; gx++) {
+        const px = (gx + 0.5) / N, py = (gy + 0.5) / N;
+        let v = 0;
+        for (const z of zonesDef) { const d2 = (px - z.x) ** 2 + (py - z.y) ** 2; v += weight(z) * Math.exp(-d2 / 0.0035); }
+        const step = Math.min(5, Math.round(v * 5));
+        if (step < 1) continue;
+        cells.push({ style: 'left:' + (gx / N * 100) + '%;top:' + (gy / N * 100) + '%;width:' + (100 / N) + '%;height:' + (100 / N) + '%;background:var(--heat-' + step + ');opacity:' + (0.35 + step * 0.11).toFixed(2) + ';' });
+      }
+    } else {
+      zonesDef.forEach((z) => {
+        const kd = z.deaths ? z.kills / z.deaths : 2;
+        const col = kd >= 1 ? 'var(--cyan)' : 'var(--signal)';
+        const r = 5.5;
+        cells.push({ style: 'left:' + (z.x * 100 - r) + '%;top:' + (z.y * 100 - r) + '%;width:' + (2 * r) + '%;height:' + (2 * r) + '%;background:' + col + ';opacity:' + (Math.abs(Math.log(kd)) > 0.6 ? 0.75 : 0.45) + ';clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);' });
+      });
+    }
+    const zoneData = {
+      'mid-top': { summary: 'Você morre aqui em 3 de cada 10 rounds de ataque, quase sempre antes dos 20 segundos, tentando tirar info sem smoke.', rounds: [{ label: 'Partida 4, round 7', result: 'Primeira morte, round perdido' }, { label: 'Partida 6, round 15', result: 'Primeira morte, round perdido' }, { label: 'Partida 9, round 3', result: 'Trocado, round vencido' }] },
+      'a-site': { summary: 'É onde você mais abate: 11 abates, quase sempre segurando o pós-plant com Dark Cover em Tree.', rounds: [{ label: 'Partida 2, round 11', result: '2 abates, round vencido' }, { label: 'Partida 8, round 19', result: 'Clutch 1 contra 2' }] }
+    };
+    const zones = zonesDef.map((z) => ({
+      ...z, on: this.state.zone === z.id, cls: 'callout' + (this.state.zone === z.id ? ' sel' : ''),
+      style: 'left:' + (z.x * 100) + '%;top:' + (z.y * 100) + '%;',
+      pick: () => this.setState({ zone: z.id })
+    }));
+    const zs = zonesDef.find((z) => z.id === this.state.zone);
+    let zone = null;
+    if (zs) {
+      const extra = zoneData[zs.id] || { summary: zs.name + ': ' + zs.kills + ' abates e ' + zs.deaths + ' mortes no lado de ataque.', rounds: [{ label: 'Partida 5, round 9', result: 'Round vencido' }] };
+      const dd = zs.deaths - zs.avgD;
+      zone = { name: zs.name, summary: extra.summary, rounds: extra.rounds, kills: String(zs.kills), deaths: String(zs.deaths),
+        deathsDelta: (dd > 0 ? '+' : '') + dd, deathsTone: dd > 0 ? 'down' : (dd < 0 ? 'up' : 'neutral') };
+    }
+    const modes = [{ id: 'presenca', label: 'Presença' }, { id: 'abates', label: 'Abates' }, { id: 'mortes', label: 'Mortes' }, { id: 'kd', label: 'K/D por local' }];
+    const insights = {
+      presenca: 'Você passa boa parte do ataque entre A Lobby e Mid Top.',
+      abates: 'Seus abates se concentram no A Site, depois do plant.',
+      mortes: 'Mid Top concentra suas mortes: 9 em 9 partidas, mais que o dobro da média do mapa.',
+      kd: 'Você ganha os duelos no A Site e no B Site e perde a maioria no meio.'
+    };
+    const legend = mode === 'kd' ? ['var(--signal)', 'var(--cyan)'] : [1, 2, 3, 4, 5].map((i) => 'var(--heat-' + i + ')');
+    const fmtKd = (z) => z.deaths ? (z.kills / z.deaths).toFixed(2).replace('.', ',') : '-';
+    return {
+      none: null, yes: true, s14: 14, s16: 16, n1: 1, n2: 2,
+      mapas: [{ value: 'ascent', label: 'Ascent' }, { value: 'bind', label: 'Bind' }, { value: 'lotus', label: 'Lotus' }],
+      lados: [{ value: 'atk', label: 'Ataque' }, { value: 'def', label: 'Defesa' }],
+      agentes: [{ value: 'todos', label: 'Todos os agentes' }, { value: 'omen', label: 'Omen' }, { value: 'harbor', label: 'Harbor' }],
+      modeBtns: modes.map((m) => ({ ...m, on: mode === m.id, cls: 'seg' + (mode === m.id ? ' on' : ''), pick: () => this.setState({ mode: m.id }) })),
+      insight: insights[mode], cells, zones,
+      hasZone: !!zone, noZone: !zone, zone: zone || { name: '', rounds: [] },
+      clearZone: () => this.setState({ zone: null }),
+      legend: legend.map((c) => ({ style: 'width:20px;height:12px;display:inline-block;background:' + c + ';' })),
+      legendLow: mode === 'kd' ? 'Perde duelos' : 'Pouco',
+      legendHigh: mode === 'kd' ? 'Ganha duelos' : 'Muito',
+      selectedId: this.state.zone,
+      tableCols: [{ key: 'name', label: 'Callout' }, { key: 'kills', label: 'Abates', numeric: true }, { key: 'deaths', label: 'Mortes', numeric: true }, { key: 'avgD', label: 'Mortes, média do mapa', numeric: true }, { key: 'kd', label: 'K/D', numeric: true }],
+      tableRows: zonesDef.map((z) => ({ id: z.id, name: z.name, kills: z.kills, deaths: z.deaths, avgD: z.avgD, kd: fmtKd(z) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

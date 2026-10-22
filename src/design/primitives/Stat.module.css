@@ -1,0 +1,14 @@
+.stat { display: flex; flex-direction: column; gap: var(--space-1); min-width: 160px; }
+.label {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-family: var(--font-display); font-weight: 600; font-size: 13px; line-height: 16px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted);
+}
+.value { font-family: var(--font-display); font-weight: 700; font-size: 48px; line-height: 48px; color: var(--bone); font-variant-numeric: tabular-nums; }
+.unit { font-size: 24px; margin-left: 2px; color: var(--bone-muted); }
+.cmp { display: flex; align-items: center; gap: var(--space-1); font-size: 13px; line-height: 18px; color: var(--bone-muted); }
+.cmp strong { font-weight: 500; }
+.neutral {}
+.up strong, .up svg { color: var(--ok); }
+.down strong, .down svg { color: var(--signal-text); }
+.low .value, .low .cmp { opacity: 0.45; }
+.sample { font-size: 13px; line-height: 18px; color: var(--bone-muted); }
