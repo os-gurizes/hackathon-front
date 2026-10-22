@@ -38,7 +38,15 @@ export const ICONS = {
   play: [["s", "M7 4l12 8-12 8z"]],
   pause: [["s", "M6.5 4h3.5v16H6.5zM14 4h3.5v16H14z"]],
   close: [["s", "M5 5l14 14M19 5L5 19"]],
-  chevron: [["s", "M6 9l6 6 6-6"]]
+  chevron: [["s", "M6 9l6 6 6-6"]],
+  // Prancheta (adicionados no app, mesmo grid e traço)
+  select: [["s", "M5 3.5l14 7-6.5 2-2 6.5z"], ["s", "M12.5 12.5l6 6"]],
+  text: [["s", "M5 6V4h14v2M12 4v16M9 20h6"]],
+  undo: [["s", "M9 5L4 10l5 5"], ["s", "M4 10h11l4 4v5"]],
+  redo: [["s", "M15 5l5 5-5 5"], ["s", "M20 10H9l-4 4v5"]],
+  rotate: [["s", "M20 13v6l-1.5 1.5h-13L4 19V7.5L5.5 6H15"], ["s", "M12 3l3 3-3 3"]],
+  eye: [["s", "M2.5 12l4.5-5.5h10l4.5 5.5-4.5 5.5H7z"], ["f", "M10.5 10.5h3v3h-3z"]],
+  "eye-off": [["s", "M2.5 12l4.5-5.5h10l4.5 5.5-4.5 5.5H7z"], ["s", "M4 20L20 4"]]
 } satisfies Record<string, IconPart[]>;
 
 export type IconName = keyof typeof ICONS;

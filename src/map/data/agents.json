@@ -1,0 +1,959 @@
+[
+ {
+  "id": "41fb69c1-4189-7b37-f117-bcaf1e96f1bf",
+  "name": "Astra",
+  "role": "Controlador",
+  "color": "#26146c",
+  "icon": "agentes/astra/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Poço Gravitacional",
+    "icon": "agentes/astra/habilidades/c-gravity-well.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Pulso Nova",
+    "icon": "agentes/astra/habilidades/q-nova-pulse.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Nebulosa / Dissipar",
+    "icon": "agentes/astra/habilidades/e-nebula-dissipate.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Forma Astral / Divisa\nCósmica",
+    "icon": "agentes/astra/habilidades/x-astral-form-cosmic-divide.png"
+   }
+  ]
+ },
+ {
+  "id": "5f8d3a7f-467b-97f3-062c-13acf203c006",
+  "name": "Breach",
+  "role": "Iniciador",
+  "color": "#81331a",
+  "icon": "agentes/breach/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Pós-choque",
+    "icon": "agentes/breach/habilidades/c-aftershock.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Estopim",
+    "icon": "agentes/breach/habilidades/q-flashpoint.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Falha Tectônica",
+    "icon": "agentes/breach/habilidades/e-fault-line.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Onda Trovejante",
+    "icon": "agentes/breach/habilidades/x-rolling-thunder.png"
+   }
+  ]
+ },
+ {
+  "id": "9f0d8ba9-4140-b941-57d3-a7ad57c6b417",
+  "name": "Brimstone",
+  "role": "Controlador",
+  "color": "#363c4f",
+  "icon": "agentes/brimstone/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Sinalizador Estimulante",
+    "icon": "agentes/brimstone/habilidades/c-stim-beacon.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Incendiário",
+    "icon": "agentes/brimstone/habilidades/q-incendiary.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Fumaça Celeste",
+    "icon": "agentes/brimstone/habilidades/e-sky-smoke.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Ataque Orbital",
+    "icon": "agentes/brimstone/habilidades/x-orbital-strike.png"
+   }
+  ]
+ },
+ {
+  "id": "22697a3d-45bf-8dd7-4fec-84a9e28c69d7",
+  "name": "Chamber",
+  "role": "Sentinela",
+  "color": "#20435b",
+  "icon": "agentes/chamber/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Marca Registrada",
+    "icon": "agentes/chamber/habilidades/c-trademark.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Caçador de Cabeças",
+    "icon": "agentes/chamber/habilidades/q-headhunter.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Rendezvous",
+    "icon": "agentes/chamber/habilidades/e-rendezvous.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Tour de Force",
+    "icon": "agentes/chamber/habilidades/x-tour-de-force.png"
+   }
+  ]
+ },
+ {
+  "id": "1dbf2edd-4729-0984-3115-daa5eed44993",
+  "name": "Clove",
+  "role": "Controlador",
+  "color": "#4b1d80",
+  "icon": "agentes/clove/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Revitalizar",
+    "icon": "agentes/clove/habilidades/c-pick-me-up.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Desvitalização",
+    "icon": "agentes/clove/habilidades/q-meddle.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Artimanha",
+    "icon": "agentes/clove/habilidades/e-ruse.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Ainda Não Morri",
+    "icon": "agentes/clove/habilidades/x-not-dead-yet.png"
+   }
+  ]
+ },
+ {
+  "id": "117ed9e3-49f3-6512-3ccf-0cada7e3823b",
+  "name": "Cypher",
+  "role": "Sentinela",
+  "color": "#2f5078",
+  "icon": "agentes/cypher/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Fio-armadilha",
+    "icon": "agentes/cypher/habilidades/c-trapwire.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Jaula Cibernética",
+    "icon": "agentes/cypher/habilidades/q-cyber-cage.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Câmera de Vigilância",
+    "icon": "agentes/cypher/habilidades/e-spycam.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Assalto Neural",
+    "icon": "agentes/cypher/habilidades/x-neural-theft.png"
+   }
+  ]
+ },
+ {
+  "id": "cc8b64c8-4b25-4ff9-6e7f-37b4da43d235",
+  "name": "Deadlock",
+  "role": "Sentinela",
+  "color": "#425495",
+  "icon": "agentes/deadlock/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Barreira de Contenção",
+    "icon": "agentes/deadlock/habilidades/c-barrier-mesh.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Sensor Sônico",
+    "icon": "agentes/deadlock/habilidades/q-sonic-sensor.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "GravNet",
+    "icon": "agentes/deadlock/habilidades/e-gravnet.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Aniquilação",
+    "icon": "agentes/deadlock/habilidades/x-annihilation.png"
+   }
+  ]
+ },
+ {
+  "id": "dade69b4-4f5a-8528-247b-219e5a1facd6",
+  "name": "Fade",
+  "role": "Iniciador",
+  "color": "#1d2846",
+  "icon": "agentes/fade/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Espreitador",
+    "icon": "agentes/fade/habilidades/c-prowler.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Clausura",
+    "icon": "agentes/fade/habilidades/q-seize.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Assombrar",
+    "icon": "agentes/fade/habilidades/e-haunt.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Véu da Noite",
+    "icon": "agentes/fade/habilidades/x-nightfall.png"
+   }
+  ]
+ },
+ {
+  "id": "e370fa57-4757-3604-3648-499e1f642d3f",
+  "name": "Gekko",
+  "role": "Iniciador",
+  "color": "#371c5c",
+  "icon": "agentes/gekko/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Mosh Pit",
+    "icon": "agentes/gekko/habilidades/c-mosh-pit.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Wingman",
+    "icon": "agentes/gekko/habilidades/q-wingman.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Dizzy",
+    "icon": "agentes/gekko/habilidades/e-dizzy.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Thrash",
+    "icon": "agentes/gekko/habilidades/x-thrash.png"
+   }
+  ]
+ },
+ {
+  "id": "95b78ed7-4637-86d9-7e41-71ba8c293152",
+  "name": "Harbor",
+  "role": "Controlador",
+  "color": "#275146",
+  "icon": "agentes/harbor/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Temporal",
+    "icon": "agentes/harbor/habilidades/c-storm-surge.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Maré Alta",
+    "icon": "agentes/harbor/habilidades/q-high-tide.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Enseada",
+    "icon": "agentes/harbor/habilidades/e-cove.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Acerto de Contas",
+    "icon": "agentes/harbor/habilidades/x-reckoning.png"
+   }
+  ]
+ },
+ {
+  "id": "0e38b510-41a8-5780-5e8f-568b2a4f2d6c",
+  "name": "Iso",
+  "role": "Duelista",
+  "color": "#30336e",
+  "icon": "agentes/iso/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Contingência",
+    "icon": "agentes/iso/habilidades/c-contingency.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Centelha Debilitante",
+    "icon": "agentes/iso/habilidades/q-undercut.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Fluxo Protetor",
+    "icon": "agentes/iso/habilidades/e-double-tap.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Contrato de Abate",
+    "icon": "agentes/iso/habilidades/x-kill-contract.png"
+   }
+  ]
+ },
+ {
+  "id": "add6443a-41bd-e414-f6ad-e58d267f4e95",
+  "name": "Jett",
+  "role": "Duelista",
+  "color": "#25607a",
+  "icon": "agentes/jett/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Erupção das Brumas",
+    "icon": "agentes/jett/habilidades/c-cloudburst.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Corrente Ascendente",
+    "icon": "agentes/jett/habilidades/q-updraft.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Brisa de Impulso",
+    "icon": "agentes/jett/habilidades/e-tailwind.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Tormenta de Aço",
+    "icon": "agentes/jett/habilidades/x-blade-storm.png"
+   }
+  ]
+ },
+ {
+  "id": "601dbbe7-43ce-be57-2a40-4abd24953621",
+  "name": "KAY/O",
+  "role": "Iniciador",
+  "color": "#1c2a69",
+  "icon": "agentes/kay-o/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "FRAG/mento",
+    "icon": "agentes/kay-o/habilidades/c-frag-ment.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "GRANADA/clarão",
+    "icon": "agentes/kay-o/habilidades/q-flash-drive.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "PONTO/zero",
+    "icon": "agentes/kay-o/habilidades/e-zero-point.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "ANULAR/cmd",
+    "icon": "agentes/kay-o/habilidades/x-null-cmd.png"
+   }
+  ]
+ },
+ {
+  "id": "1e58de9c-4950-5125-93e9-a0aee9f98746",
+  "name": "Killjoy",
+  "role": "Sentinela",
+  "color": "#522162",
+  "icon": "agentes/killjoy/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Nanoenxame",
+    "icon": "agentes/killjoy/habilidades/c-nanoswarm.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Robô de Alarme",
+    "icon": "agentes/killjoy/habilidades/q-alarmbot.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Torreta",
+    "icon": "agentes/killjoy/habilidades/e-turret.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Confinamento",
+    "icon": "agentes/killjoy/habilidades/x-lockdown.png"
+   }
+  ]
+ },
+ {
+  "id": "7c8a4701-4de6-9355-b254-e09bc2a34b72",
+  "name": "Miks",
+  "role": "Controlador",
+  "color": "#462b75",
+  "icon": "agentes/miks/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Pulso M",
+    "icon": "agentes/miks/habilidades/c-m-pulse.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Harmonia",
+    "icon": "agentes/miks/habilidades/q-harmonize.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Ressonância",
+    "icon": "agentes/miks/habilidades/e-waveform.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Melodia Sísmica",
+    "icon": "agentes/miks/habilidades/x-bassquake.png"
+   }
+  ]
+ },
+ {
+  "id": "bb2a4828-46eb-8cd1-e765-15848195d751",
+  "name": "Neon",
+  "role": "Duelista",
+  "color": "#413476",
+  "icon": "agentes/neon/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Via Expressa",
+    "icon": "agentes/neon/habilidades/c-fast-lane.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Ricochete Elétrico",
+    "icon": "agentes/neon/habilidades/q-relay-bolt.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Equipamento Voltaico",
+    "icon": "agentes/neon/habilidades/e-high-gear.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Sobrecarga",
+    "icon": "agentes/neon/habilidades/x-overdrive.png"
+   }
+  ]
+ },
+ {
+  "id": "8e253930-4c05-31dd-1b6c-968525494517",
+  "name": "Omen",
+  "role": "Controlador",
+  "color": "#433178",
+  "icon": "agentes/omen/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Passos Tenebrosos",
+    "icon": "agentes/omen/habilidades/c-shrouded-step.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Paranoia",
+    "icon": "agentes/omen/habilidades/q-paranoia.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Manto Sombrio",
+    "icon": "agentes/omen/habilidades/e-dark-cover.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Salto das Sombras",
+    "icon": "agentes/omen/habilidades/x-from-the-shadows.png"
+   }
+  ]
+ },
+ {
+  "id": "eb93336a-449b-9c1b-0a54-a891f7921d69",
+  "name": "Phoenix",
+  "role": "Duelista",
+  "color": "#74321c",
+  "icon": "agentes/phoenix/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Labareda",
+    "icon": "agentes/phoenix/habilidades/c-blaze.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Mãos Quentes",
+    "icon": "agentes/phoenix/habilidades/q-hot-hands.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Bola Curva",
+    "icon": "agentes/phoenix/habilidades/e-curveball.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Renascimento",
+    "icon": "agentes/phoenix/habilidades/x-run-it-back.png"
+   }
+  ]
+ },
+ {
+  "id": "f94c3b30-42be-e959-889c-5aa313dba261",
+  "name": "Raze",
+  "role": "Duelista",
+  "color": "#742e1e",
+  "icon": "agentes/raze/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Bumba",
+    "icon": "agentes/raze/habilidades/c-boom-bot.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Carga de Explosivos",
+    "icon": "agentes/raze/habilidades/q-blast-pack.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Cartuchos de Tinta",
+    "icon": "agentes/raze/habilidades/e-paint-shells.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Estraga-prazeres",
+    "icon": "agentes/raze/habilidades/x-showstopper.png"
+   }
+  ]
+ },
+ {
+  "id": "a3bfb853-43b2-7238-a4f1-ad90e9e46bcc",
+  "name": "Reyna",
+  "role": "Duelista",
+  "color": "#662d62",
+  "icon": "agentes/reyna/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Olhar Voraz",
+    "icon": "agentes/reyna/habilidades/c-leer.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Devorar",
+    "icon": "agentes/reyna/habilidades/q-devour.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Dispensar",
+    "icon": "agentes/reyna/habilidades/e-dismiss.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Imperatriz",
+    "icon": "agentes/reyna/habilidades/x-empress.png"
+   }
+  ]
+ },
+ {
+  "id": "569fdd95-4d10-43ab-ca70-79becc718b46",
+  "name": "Sage",
+  "role": "Sentinela",
+  "color": "#1f5148",
+  "icon": "agentes/sage/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Orbe de Barreira",
+    "icon": "agentes/sage/habilidades/c-barrier-orb.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Orbe de Lentidão",
+    "icon": "agentes/sage/habilidades/q-slow-orb.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Orbe Curativo",
+    "icon": "agentes/sage/habilidades/e-healing-orb.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Ressurreição",
+    "icon": "agentes/sage/habilidades/x-resurrection.png"
+   }
+  ]
+ },
+ {
+  "id": "6f2a04ca-43e0-be17-7f36-b3908627744d",
+  "name": "Skye",
+  "role": "Iniciador",
+  "color": "#436a51",
+  "icon": "agentes/skye/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Reflorescer",
+    "icon": "agentes/skye/habilidades/c-regrowth.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Predador Explosivo",
+    "icon": "agentes/skye/habilidades/q-trailblazer.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Luz Desbravadora",
+    "icon": "agentes/skye/habilidades/e-guiding-light.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Rastreadores",
+    "icon": "agentes/skye/habilidades/x-seekers.png"
+   }
+  ]
+ },
+ {
+  "id": "320b2a48-4d9b-a075-30f1-1f93a9b638fa",
+  "name": "Sova",
+  "role": "Iniciador",
+  "color": "#355285",
+  "icon": "agentes/sova/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Drone Coruja",
+    "icon": "agentes/sova/habilidades/c-owl-drone.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Flecha de Choque",
+    "icon": "agentes/sova/habilidades/q-shock-bolt.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Flecha Rastreadora",
+    "icon": "agentes/sova/habilidades/e-recon-bolt.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Fúria do Caçador",
+    "icon": "agentes/sova/habilidades/x-hunter-s-fury.png"
+   }
+  ]
+ },
+ {
+  "id": "b444168c-4e35-8076-db47-ef9bf368f384",
+  "name": "Tejo",
+  "role": "Iniciador",
+  "color": "#80451b",
+  "icon": "agentes/tejo/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Drone Furtivo",
+    "icon": "agentes/tejo/habilidades/c-stealth-drone.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Entrega Especial",
+    "icon": "agentes/tejo/habilidades/q-special-delivery.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Rajada Guiada",
+    "icon": "agentes/tejo/habilidades/e-guided-salvo.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Armagedom",
+    "icon": "agentes/tejo/habilidades/x-armageddon.png"
+   }
+  ]
+ },
+ {
+  "id": "92eeef5d-43b5-1d4a-8d03-b3927a09034b",
+  "name": "Veto",
+  "role": "Sentinela",
+  "color": "#1a5d65",
+  "icon": "agentes/veto/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Travessia",
+    "icon": "agentes/veto/habilidades/c-crosscut.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Imobilidade",
+    "icon": "agentes/veto/habilidades/q-chokehold.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Interceptador",
+    "icon": "agentes/veto/habilidades/e-interceptor.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Evolução",
+    "icon": "agentes/veto/habilidades/x-evolution.png"
+   }
+  ]
+ },
+ {
+  "id": "707eab51-4836-f488-046a-cda6bf494859",
+  "name": "Viper",
+  "role": "Controlador",
+  "color": "#1a5f46",
+  "icon": "agentes/viper/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Veneno de Cobra",
+    "icon": "agentes/viper/habilidades/c-snake-bite.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Nuvem Venenosa",
+    "icon": "agentes/viper/habilidades/q-poison-cloud.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Cortina Tóxica",
+    "icon": "agentes/viper/habilidades/e-toxic-screen.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Poço Peçonhento",
+    "icon": "agentes/viper/habilidades/x-viper-s-pit.png"
+   }
+  ]
+ },
+ {
+  "id": "efba5359-4016-a1e5-7626-b1ae76895940",
+  "name": "Vyse",
+  "role": "Sentinela",
+  "color": "#492280",
+  "icon": "agentes/vyse/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Espinheiro Cortante",
+    "icon": "agentes/vyse/habilidades/c-razorvine.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Cerca-Viva",
+    "icon": "agentes/vyse/habilidades/q-shear.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Rosa Arcana",
+    "icon": "agentes/vyse/habilidades/e-arc-rose.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Jardim de Aço",
+    "icon": "agentes/vyse/habilidades/x-steel-garden.png"
+   }
+  ]
+ },
+ {
+  "id": "df1cb487-4902-002e-5c17-d28e83e78588",
+  "name": "Waylay",
+  "role": "Duelista",
+  "color": "#482e61",
+  "icon": "agentes/waylay/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Saturação",
+    "icon": "agentes/waylay/habilidades/c-saturate.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Velocidade da Luz",
+    "icon": "agentes/waylay/habilidades/q-lightspeed.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Refração",
+    "icon": "agentes/waylay/habilidades/e-refract.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Caminhos Convergentes",
+    "icon": "agentes/waylay/habilidades/x-convergent-paths.png"
+   }
+  ]
+ },
+ {
+  "id": "7f94d92c-4234-0a36-9646-3a87eb8b5c89",
+  "name": "Yoru",
+  "role": "Duelista",
+  "color": "#222b67",
+  "icon": "agentes/yoru/minimapa.png",
+  "abilities": [
+   {
+    "slot": "Grenade",
+    "key": "C",
+    "name": "Distração",
+    "icon": "agentes/yoru/habilidades/c-fakeout.png"
+   },
+   {
+    "slot": "Ability1",
+    "key": "Q",
+    "name": "Ponto Cego",
+    "icon": "agentes/yoru/habilidades/q-blindside.png"
+   },
+   {
+    "slot": "Ability2",
+    "key": "E",
+    "name": "Passagem Dimensional",
+    "icon": "agentes/yoru/habilidades/e-gatecrash.png"
+   },
+   {
+    "slot": "Ultimate",
+    "key": "X",
+    "name": "Espionagem Dimensional",
+    "icon": "agentes/yoru/habilidades/x-dimensional-drift.png"
+   }
+  ]
+ }
+]
