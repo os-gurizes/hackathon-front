@@ -59,3 +59,11 @@ Hoje têm mock: login, logout, refresh, `/me`, `/maps`, `/agents`, `/teams`, `/t
 ## Nota para a API
 
 O `openapi.json` exportado marca como obrigatórios os parâmetros de query que têm valor padrão (`limit`, `sort`, `minRounds`, `metric`, `resolution`). O `api:sync` corrige isso ao copiar; o ideal é a exportação já sair com `required: false` nesses casos.
+
+## Deploy na Vercel
+
+O `vercel.json` faz em produção o que o proxy do Vite faz em dev: `/api/*` e `/auth/*` vão para a API pelo próprio domínio do front (assim os cookies de sessão funcionam) e qualquer outra rota abre o app.
+
+- **A URL da API está escrita no `vercel.json`.** Se o túnel do ngrok reiniciar, a URL muda: troque nas duas linhas de `rewrites` e faça um novo deploy. Um domínio fixo do ngrok (a conta gratuita tem um) evita isso.
+- Não configure `VITE_API_MOCK` nem `VITE_API_URL` na Vercel.
+- Para testar o build antes de subir: `npm run build` e `npm run preview` (usa o mesmo proxy, lendo `VITE_API_PROXY` do `.env.local`).

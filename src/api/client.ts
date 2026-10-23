@@ -1,9 +1,20 @@
 import createClient from "openapi-fetch";
 import type { paths } from "./schema";
 
-/** Em dev o Vite repassa `/api` para a API (ver vite.config.ts); em produção, a URL vem do ambiente. */
+// O front fala com a API pelo próprio domínio: em dev o Vite repassa /api e /auth (vite.config.ts)
+// e na Vercel o vercel.json faz o mesmo. Assim os cookies de sessão são do mesmo site.
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 export const API_BASE = new URL(API_URL, window.location.origin).toString().replace(/\/$/, "");
+
+/**
+ * Login, refresh e logout passam por /auth na raiz, não por /api/auth: a API grava o cookie de
+ * refresh no caminho /auth, e o navegador só o envia para endereços que começam assim.
+ * Se VITE_API_URL apontar para outro endereço, tudo vai para lá.
+ */
+export const AUTH_BASE = import.meta.env.VITE_API_URL ? API_BASE : window.location.origin;
+
+// Túnel do ngrok (gratuito) responde uma página de aviso em vez da API sem este cabeçalho
+const HEADERS = { "ngrok-skip-browser-warning": "1" };
 
 export type ApiErrorCode = "VALIDATION" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "INTERNAL" | "NETWORK";
 
@@ -35,7 +46,7 @@ const codeFromStatus = (status: number): ApiErrorCode =>
 // Várias requisições podem receber 401 ao mesmo tempo: uma renovação só para todas
 let refreshing: Promise<boolean> | null = null;
 function refreshSession(): Promise<boolean> {
-  refreshing ??= fetch(`${API_BASE}/auth/refresh`, { method: "POST", credentials: "include" })
+  refreshing ??= fetch(`${AUTH_BASE}/auth/refresh`, { method: "POST", credentials: "include", headers: HEADERS })
     .then((r) => r.ok)
     .catch(() => false)
     .finally(() => {
@@ -52,7 +63,9 @@ async function fetchWithRefresh(request: Request): Promise<Response> {
   return (await refreshSession()) ? fetch(retry) : response;
 }
 
-export const api = createClient<paths>({ baseUrl: API_BASE, credentials: "include", fetch: fetchWithRefresh });
+export const api = createClient<paths>({ baseUrl: API_BASE, credentials: "include", headers: HEADERS, fetch: fetchWithRefresh });
+// `fetch` lido na hora da chamada (e não guardado ao criar o cliente) para os mocks interceptarem
+export const authApi = createClient<paths>({ baseUrl: AUTH_BASE, credentials: "include", headers: HEADERS, fetch: (r) => fetch(r) });
 
 type Result<T> = { data?: T; error?: unknown; response: Response };
 

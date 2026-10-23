@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://d985-2804-14c-4b6-1038-2e0-8ff-feed-d0fe.ngrok-free.app/:path*" },
+    { "source": "/auth/:path*", "destination": "https://d985-2804-14c-4b6-1038-2e0-8ff-feed-d0fe.ngrok-free.app/auth/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

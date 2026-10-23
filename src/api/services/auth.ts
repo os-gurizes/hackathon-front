@@ -1,8 +1,8 @@
-import { api, unwrap } from "../client";
+import { api, authApi, unwrap } from "../client";
 import type { LoginInput } from "../types";
 
 export const authService = {
-  login: (body: LoginInput) => unwrap(api.POST("/auth/login", { body })),
-  logout: () => unwrap(api.POST("/auth/logout")),
+  login: (body: LoginInput) => unwrap(authApi.POST("/auth/login", { body })),
+  logout: () => unwrap(authApi.POST("/auth/logout")),
   me: () => unwrap(api.GET("/me")),
 };
