@@ -18,6 +18,8 @@ export default defineConfig({
     command: `npm run dev -- --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
+    // Os testes usam os dados de exemplo, qualquer que seja o .env.local
+    env: { VITE_API_MOCK: "true" },
     timeout: 60_000,
   },
 });

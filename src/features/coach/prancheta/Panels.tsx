@@ -149,8 +149,11 @@ export function MapPanel({
   onMap,
   onSide,
   onBackground,
+  heatmapLabel,
 }: {
   playbook: Playbook;
+  /** Rótulo da opção de heatmap; sem ele (ex.: sem time ou sem dados), a opção não aparece. */
+  heatmapLabel?: string;
   onMap: (id: string) => void;
   onSide: (s: Side) => void;
   onBackground: (b: Background) => void;
@@ -158,6 +161,7 @@ export function MapPanel({
   const backgrounds: { id: Background; label: string }[] = [
     { id: "minimap", label: "Só o minimapa" },
     { id: "callouts", label: "Minimapa com callouts" },
+    ...(heatmapLabel ? [{ id: "heatmap" as const, label: heatmapLabel }] : []),
   ];
   return (
     <section className={cx(styles.panel, "st-cut")} aria-labelledby="mapa">
