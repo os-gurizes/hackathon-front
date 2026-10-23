@@ -122,8 +122,15 @@ function headline(overall: Totals, attack: Totals | undefined, recent: Match[]) 
 
 export default function MeuDesempenhoPage() {
   const me = useMe();
-  const playerId = me.player?.id;
+  if (me.player == null) return <p className={styles.state}>Sua conta ainda não está ligada a um jogador.</p>;
+  return <DesempenhoView playerId={me.player.id} />;
+}
 
+/**
+ * A tela em si, para qualquer jogador. O coach usa em modo leitura a partir do Elenco:
+ * sem os links para Meus mapas, que é uma aba só do player.
+ */
+export function DesempenhoView({ playerId: id, readOnly = false }: { playerId: number; readOnly?: boolean }) {
   const [mapId, setMapId] = useState("");
   const [side, setSide] = useState<Side | "">("");
   const filtered = mapId !== "" || side !== "";
@@ -132,24 +139,17 @@ export default function MeuDesempenhoPage() {
     ...(side ? { side } : {}),
   };
 
-  const enabled = playerId != null;
-  const id = playerId ?? 0;
-  const profile = useQuery({ ...q.players.get(id), enabled });
+  const profile = useQuery(q.players.get(id));
   // Sem filtro as duas consultas têm a mesma chave e o TanStack Query faz uma só
-  const all = useQuery({ ...q.players.stats(id), enabled });
+  const all = useQuery(q.players.stats(id));
   // Ao trocar o filtro, os números anteriores ficam na tela até os novos chegarem
   const stats = useQuery({
     ...q.players.stats(id, filtered ? filters : undefined),
-    enabled,
     placeholderData: keepPreviousData,
   });
-  const matches = useQuery({ ...q.players.matches(id), enabled });
-  const insights = useQuery({
-    ...q.insights({ scope: "player", id }),
-    enabled,
-  });
+  const matches = useQuery(q.players.matches(id));
+  const insights = useQuery(q.insights({ scope: "player", id }));
 
-  if (playerId == null) return <p className={styles.state}>Sua conta ainda não está ligada a um jogador.</p>;
   if (stats.error) return <p className={styles.state}>{stats.error.message}</p>;
   if (stats.isPending) return <p className={styles.state}>Carregando seu desempenho.</p>;
 
@@ -251,7 +251,7 @@ export default function MeuDesempenhoPage() {
         ) : topInsights.length ? (
           <div className={styles.cards}>
             {topInsights.map((i) => (
-              <InsightCard key={i.id} insight={i} />
+              <InsightCard key={i.id} insight={i} readOnly={readOnly} />
             ))}
           </div>
         ) : (
@@ -418,7 +418,7 @@ const mapLink = (i: Insight) => {
   return `/player/mapas?${params.toString()}`;
 };
 
-function InsightCard({ insight: i }: { insight: Insight }) {
+function InsightCard({ insight: i, readOnly }: { insight: Insight; readOnly: boolean }) {
   const banner = i.map ? mapBanner(i.map.name) : undefined;
   const tone: BadgeTone = i.polarity === "negative" ? "alert" : i.polarity === "positive" ? "gold" : "neutral";
   const label = i.polarity === "positive" ? "Ponto forte" : KIND_LABEL[i.kind];
@@ -437,7 +437,7 @@ function InsightCard({ insight: i }: { insight: Insight }) {
         <h3 className={styles.cardTitle}>{i.title}</h3>
         <p className={styles.cardText}>{i.body}</p>
         <p className={styles.note}>{i.isEstimate ? estimateHelp(i.kind) : `Leitura feita a partir de ${fmt(i.sampleSize)} casos.`}</p>
-        {i.map ? (
+        {i.map && !readOnly ? (
           <a href={mapLink(i)} onClick={linkHandler(mapLink(i))} className={styles.cardLink}>
             Ver no mapa
           </a>

@@ -1,0 +1,22 @@
+.page { display: flex; flex-direction: column; gap: var(--space-8); }
+.section { display: flex; flex-direction: column; gap: var(--space-6); }
+.panel { background: var(--ink-800); padding: var(--space-6); }
+.filters { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-end; }
+.headline { margin: 0; max-width: 880px; font-size: 28px; line-height: 36px; font-weight: 500; }
+.note { margin: 0; font-size: 13px; line-height: 18px; color: var(--bone-muted); }
+.state { color: var(--bone-muted); }
+.estimate { margin: 0; display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; font-size: 13px; line-height: 18px; color: var(--bone-muted); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+.card { display: flex; flex-direction: column; gap: var(--space-3); }
+.withBanner { padding-top: 0; }
+.banner { width: calc(100% + 2 * var(--space-6)); margin: 0 calc(-1 * var(--space-6)) var(--space-1); height: 64px; object-fit: cover; display: block; filter: brightness(0.7); }
+.badges { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.cardTitle { margin: 0; font: 600 20px/24px var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
+.cardText { margin: 0; font-size: 15px; line-height: 22px; }
+.action { align-self: flex-start; margin-top: auto; }
+
+/* Tabela completa: rola na horizontal no celular */
+.scroll { overflow-x: auto; margin-bottom: var(--space-4); }
+.scroll table { min-width: 760px; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

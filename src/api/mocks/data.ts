@@ -15,6 +15,7 @@ import type {
   PlayerStats,
   TeamDetail,
   TeamEconomy,
+  TeamStrategies,
   TeamSummary,
 } from "../types";
 
@@ -327,6 +328,69 @@ export const PLAYER_STATS: PlayerStats = {
     })),
   },
 };
+
+// K/D, ACS, partidas, KAST e HS% de cada jogador do elenco: números diferentes para a comparação
+// lado a lado do Elenco fazer sentido. O 101 (o player logado nos mocks) fica igual a PLAYER_STATS.
+const PLAYER_FORM: Record<number, [number, number, number, number, number]> = {
+  102: [1.27, 248, 18, 0.76, 0.29],
+  103: [0.94, 196, 18, 0.74, 0.19],
+  104: [0.88, 184, 18, 0.69, 0.21],
+  105: [1.03, 209, 14, 0.71, 0.26],
+};
+export const playerStatsFor = (id: number): PlayerStats => {
+  const form = PLAYER_FORM[id];
+  if (!form) return PLAYER_STATS;
+  const [kd, acs, matches, kast, headshotRate] = form;
+  return { ...PLAYER_STATS, overall: { ...totals(kd, acs, matches), kast, headshotRate } };
+};
+
+/** Intervalo de confiança aproximado (95%) para a taxa de vitória da estratégia. */
+const interval = (wins: number, rounds: number): [number, number] => {
+  const p = wins / rounds;
+  const e = 1.96 * Math.sqrt((p * (1 - p)) / rounds);
+  return [Math.max(0, Math.round((p - e) * 100) / 100), Math.min(1, Math.round((p + e) * 100) / 100)];
+};
+
+type StrategyMock = [slug: string, side: "attack" | "defense", title: string, description: string, rounds: number, wins: number, overall: number];
+const STRATEGY_LIST: StrategyMock[] = [
+  ["ascent", "attack", "Execução rápida no A", "Quatro entram pelo A Main com smoke no Heaven e no Tree. Um segura o meio.", 34, 22, 0.52],
+  ["ascent", "defense", "Retake do B com três", "Dois seguram o B e três giram do meio assim que o plant é ouvido.", 29, 19, 0.47],
+  ["ascent", "attack", "Domínio do meio com split no B", "Controle do Mid Courtyard antes de dividir para o B pelo Market.", 21, 9, 0.49],
+  ["lotus", "attack", "Pressão no C pela porta giratória", "Três forçam o C Mound enquanto dois fazem barulho no A.", 18, 7, 0.51],
+  ["lotus", "defense", "Defesa empilhada no A", "Três jogadores no A desde o começo, um no B e um flutuando no C.", 16, 10, 0.45],
+  ["haven", "attack", "Garagem para o C", "Entrada pela Garage com flash e smoke no C Long. Plant rápido no C.", 15, 5, 0.5],
+  ["haven", "defense", "Rotação cedo do A para o C", "O A gira para o C antes de qualquer contato, no primeiro som de passos.", 12, 3, 0.44],
+  ["split", "attack", "Entrada no B pelo Heaven", "Smoke no Heaven e no Rafters, entrada pelo B Main com a ultimate do controlador.", 14, 8, 0.53],
+  ["split", "defense", "Setups variados sem padrão", "Rounds sem um setup claro: as posições mudam a cada round.", 22, 10, 0.5],
+];
+
+export const TEAM_STRATEGIES: TeamStrategies = STRATEGY_LIST.map(([slug, side, title, description, rounds, wins, overall], i) => ({
+  strategy: {
+    id: 300 + i,
+    map: map(slug),
+    side,
+    title,
+    description,
+    isNoise: title.startsWith("Setups variados"),
+    regionCounts: {},
+    topZones: [
+      { zoneId: 1, name: side === "attack" ? "Attacker Spawn" : "Defender Spawn", share: 0.4 },
+      { zoneId: 2, name: "Mid", share: 0.25 },
+    ],
+    plantSites: side === "attack" ? { [title.match(/\b([ABC])\b/)?.[1] ?? "A"]: 0.8 } : {},
+    plantTimeSeconds: side === "attack" ? 38 + i * 3 : null,
+    overallWinRate: overall,
+    overallRounds: rounds * 6,
+  },
+  rounds,
+  wins,
+  winRate: wins / rounds,
+  confidenceInterval: interval(wins, rounds),
+  examples: [
+    { matchId: 9001 + i, number: 3 + i },
+    { matchId: 9004 + i, number: 15 },
+  ],
+}));
 
 export const PLAYER_MATCHES: PlayerMatches = {
   items: Array.from({ length: 10 }, (_, i) => {

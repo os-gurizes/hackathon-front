@@ -1,0 +1,51 @@
+.page { display: flex; flex-direction: column; gap: var(--space-8); }
+.section { display: flex; flex-direction: column; gap: var(--space-6); }
+.panel { background: var(--ink-800); padding: var(--space-6); }
+.filters { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-end; }
+.headline { margin: 0; max-width: 880px; font-size: 28px; line-height: 36px; font-weight: 500; }
+.note { margin: 0; font-size: 13px; line-height: 18px; color: var(--bone-muted); }
+.state { color: var(--bone-muted); }
+.up { color: var(--ok); }
+.down { color: var(--signal-text); }
+
+/* Barras por tipo de compra: rótulo, barra com o traço do esperado e o número */
+.bars { display: flex; flex-direction: column; gap: var(--space-6); }
+.bar {
+  display: grid; gap: var(--space-2) var(--space-4); align-items: center;
+  grid-template-columns: minmax(140px, 180px) minmax(0, 1fr) minmax(180px, 240px);
+}
+.bar > .note:last-child { grid-column: 2 / -1; }
+.barLabel { display: flex; flex-direction: column; gap: 2px; font: 600 15px/20px var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
+.track { position: relative; height: 20px; background: var(--ink-900); }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--signal); }
+.expected { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--bone); }
+.barValue { display: flex; flex-direction: column; gap: 2px; }
+.barValue strong { font: 700 24px/28px var(--font-display); font-variant-numeric: tabular-nums; }
+@media (max-width: 720px) {
+  .bar { grid-template-columns: minmax(0, 1fr); }
+  .bar > .note:last-child { grid-column: auto; }
+}
+
+/* Matriz 5 x 5: rola na horizontal no celular */
+.scroll { overflow-x: auto; margin-bottom: var(--space-4); }
+.matrix { display: flex; flex-direction: column; gap: 4px; min-width: 760px; }
+.row { display: grid; gap: 4px; grid-template-columns: minmax(140px, 1fr) repeat(5, minmax(110px, 1fr)); }
+.head {
+  padding: 8px 12px; font: 600 13px/16px var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted);
+}
+.head:first-child { padding-left: 0; }
+.rowHead {
+  display: flex; align-items: center; padding: 12px 12px 12px 0;
+  font: 600 15px/20px var(--font-display); letter-spacing: 0.04em; text-transform: uppercase;
+}
+.cell { display: flex; flex-direction: column; gap: 2px; padding: 12px; color: var(--bone); }
+.cell strong { font: 700 22px/24px var(--font-display); font-variant-numeric: tabular-nums; }
+.cellNote { font-size: 12px; line-height: 16px; color: var(--bone); opacity: 0.8; }
+.empty { background: var(--ink-900); color: var(--bone-muted); font-size: 13px; justify-content: center; }
+.low { opacity: 0.45; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+.card { display: flex; flex-direction: column; gap: var(--space-3); }
+.badges { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.cardTitle { margin: 0; font: 600 20px/24px var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
+.cardText { margin: 0; font-size: 15px; line-height: 22px; }

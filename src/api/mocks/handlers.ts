@@ -14,10 +14,11 @@ import {
   PLAYER_INSIGHTS,
   PLAYER_MATCHES,
   PLAYER_PROFILE,
-  PLAYER_STATS,
+  playerStatsFor,
   TEAM_DETAIL,
   TEAM_ECONOMY,
   TEAM_INSIGHTS,
+  TEAM_STRATEGIES,
   TEAMS,
 } from "./data";
 
@@ -78,6 +79,7 @@ export const handlers = [
   http.get(url("/teams"), authed(() => HttpResponse.json(TEAMS))),
   http.get(url("/teams/:id"), authed(() => HttpResponse.json(TEAM_DETAIL))),
   http.get(url("/teams/:id/economy"), authed(() => HttpResponse.json(TEAM_ECONOMY))),
+  http.get(url("/teams/:id/strategies"), authed(() => HttpResponse.json(TEAM_STRATEGIES))),
 
   http.get(
     url("/insights"),
@@ -99,7 +101,7 @@ export const handlers = [
   ),
 
   http.get(url("/players/:id"), authed(({ params }) => HttpResponse.json(PLAYER_PROFILE(Number(params.id))))),
-  http.get(url("/players/:id/stats"), authed(() => HttpResponse.json(PLAYER_STATS))),
+  http.get(url("/players/:id/stats"), authed(({ params }) => HttpResponse.json(playerStatsFor(Number(params.id))))),
   http.get(url("/players/:id/matches"), authed(() => HttpResponse.json(PLAYER_MATCHES))),
 
   http.get(url("/matches"), authed(() => HttpResponse.json(MATCHES))),
