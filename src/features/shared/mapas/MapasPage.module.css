@@ -38,3 +38,6 @@
 .swatch { width: 28px; height: 10px; }
 .low { color: var(--bone-muted); display: inline-flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 .state { color: var(--bone-muted); }
+.up { color: var(--bone); font-weight: 500; }
+.down { color: var(--bone-muted); }
+.even { color: var(--bone-muted); }
