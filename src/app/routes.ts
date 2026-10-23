@@ -19,6 +19,11 @@ const ElencoPage = lazy(() => import("../features/coach/elenco/ElencoPage"));
 const JogadorPage = lazy(() => import("../features/coach/elenco/JogadorPage"));
 const EconomiaPage = lazy(() => import("../features/coach/economia/EconomiaPage"));
 const MeuDesempenhoPage = lazy(() => import("../features/player/desempenho/MeuDesempenhoPage"));
+const PadroesPage = lazy(() => import("../features/player/padroes/PadroesPage"));
+const PressaoPage = lazy(() => import("../features/player/pressao/PressaoPage"));
+const ArmasPage = lazy(() => import("../features/player/armas/ArmasPage"));
+const AgentesPage = lazy(() => import("../features/player/agentes/AgentesPage"));
+const PartidasPage = lazy(() => import("../features/player/partidas/PartidasPage"));
 const MapasPage = lazy(() => import("../features/shared/mapas/MapasPage"));
 const PartidaPage = lazy(() => import("../features/coach/partida/PartidaPage"));
 const ContasPage = lazy(() => import("../features/admin/ContasPage"));
@@ -36,6 +41,11 @@ export const ROUTES: RouteDef[] = [
   { path: "/admin/contas", roles: ["admin"], page: ContasPage, wide: true },
   { path: "/player/desempenho", roles: ["player"], page: MeuDesempenhoPage },
   { path: "/player/mapas", roles: ["player"], page: MapasPage, wide: true },
+  { path: "/player/padroes", roles: ["player"], page: PadroesPage },
+  { path: "/player/pressao", roles: ["player"], page: PressaoPage },
+  { path: "/player/armas", roles: ["player"], page: ArmasPage },
+  { path: "/player/agentes", roles: ["player"], page: AgentesPage },
+  { path: "/player/partidas", roles: ["player"], page: PartidasPage },
 ];
 
 /** Abas de cada papel, na ordem do spec. Sem `path` aparecem esmaecidas: ainda não existem. */
@@ -55,12 +65,12 @@ export const TABS: Record<"coach" | "player", Tab[]> = {
   player: [
     { label: "Meu desempenho", path: "/player/desempenho" },
     { label: "Meus mapas", path: "/player/mapas" },
-    { label: "Meus padrões" },
-    { label: "Sob pressão" },
-    { label: "Armas" },
-    { label: "Agentes" },
+    { label: "Meus padrões", path: "/player/padroes" },
+    { label: "Sob pressão", path: "/player/pressao" },
+    { label: "Armas", path: "/player/armas" },
+    { label: "Agentes", path: "/player/agentes" },
     { label: "Economia" },
-    { label: "Partidas" },
+    { label: "Partidas", path: "/player/partidas" },
   ],
 };
 
