@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type Konva from "konva";
+import { useQuery } from "@tanstack/react-query";
+import { q } from "../../../api";
+import { useMe } from "../../../app/session";
+import { HeatLayer } from "../../../map/HeatLayer";
 import { cx } from "../../../design/cx";
 import { Button, Icon, Select } from "../../../design/primitives";
 import { pointAt } from "../../../map/abilityShapes";
@@ -29,6 +33,15 @@ export default function PranchetaPage() {
   const playbook = history.present;
   const map = findMap(playbook.mapId) ?? DEFAULT_MAP;
   const tokens = useTokens();
+  const me = useMe();
+
+  // Fundo "heatmap do time": presença do time do coach no mapa da estratégia, vinda da API
+  const apiMaps = useQuery(q.catalog.maps());
+  const apiMap = apiMaps.data?.find((m) => m.name.toLowerCase() === map.name.toLowerCase());
+  const teamHeat = useQuery({
+    ...q.maps.heatmap(apiMap?.id ?? 0, { metric: "presence", resolution: "cells", ...(me.team ? { team: me.team.id } : {}) }),
+    enabled: apiMap != null && me.team != null && playbook.background === "heatmap",
+  });
 
   const [tool, setTool] = useState<Tool>("select");
   const [activePhase, setActivePhase] = useState<Phase>("setup");
@@ -422,7 +435,7 @@ export default function PranchetaPage() {
           <MapCanvas
             map={map}
             rotation={playbook.rotation}
-            showCallouts={playbook.background === "callouts"}
+            showCallouts={playbook.background !== "minimap"}
             panOnBackground={tool === "select"}
             cursor={tool === "select" ? "grab" : tool === "eraser" ? "not-allowed" : "crosshair"}
             label={`Prancheta sobre o minimapa de ${map.name}`}
@@ -470,6 +483,16 @@ export default function PranchetaPage() {
           >
             {(ctx) => (
               <>
+                {playbook.background === "heatmap" && teamHeat.data ? (
+                  <HeatLayer
+                    cells={teamHeat.data.cells}
+                    grid={teamHeat.data.grid}
+                    maxValue={teamHeat.data.maxValue}
+                    size={ctx.size}
+                    tokens={ctx.tokens}
+                    opacity={0.75}
+                  />
+                ) : null}
                 <PlaybookLayer
                   items={items}
                   activePhase={shownPhase}
@@ -532,6 +555,7 @@ export default function PranchetaPage() {
             }}
           />
           <MapPanel
+            heatmapLabel={me.team && apiMap ? `Heatmap do time: ${me.team.displayName}` : undefined}
             playbook={playbook}
             onMap={(id) => {
               const next = findMap(id);

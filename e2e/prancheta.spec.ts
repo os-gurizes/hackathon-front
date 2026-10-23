@@ -24,9 +24,9 @@ async function clickOnMap(page: Page, [x, y]: [number, number]) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/coach/prancheta");
   await page.evaluate(() => localStorage.clear());
-  await page.goto("/");
+  await page.goto("/coach/prancheta");
   await expect(status(page)).toHaveAttribute("data-status", "saved");
 });
 

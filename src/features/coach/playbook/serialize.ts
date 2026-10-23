@@ -11,7 +11,7 @@ const num = (v: unknown): v is number => typeof v === "number" && Number.isFinit
 const str = (v: unknown, max = 200): string | null => (typeof v === "string" ? v.slice(0, max) : null);
 
 const ROTATIONS: Rotation[] = [0, 90, 180, 270];
-const BACKGROUNDS: Background[] = ["minimap", "callouts"];
+const BACKGROUNDS: Background[] = ["minimap", "callouts", "heatmap"];
 const MAX_ITEMS = 2000;
 
 function point(v: unknown): Point | null {

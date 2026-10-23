@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_API_PROXY ?? "http://localhost:3333",
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ""),
+          // O cookie de refresh da API vale só em /auth; aqui ele precisa valer em /api/auth
+          cookiePathRewrite: { "/auth": "/api/auth" },
+          // Túnel do ngrok (gratuito) mostra uma página de aviso sem este cabeçalho
+          headers: { "ngrok-skip-browser-warning": "1" },
         },
       },
     },

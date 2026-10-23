@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 
-const NAMES = ["ink-900", "ink-800", "ink-700", "line", "line-strong", "bone", "bone-muted", "signal", "cyan", "gold", "ok", "focus"] as const;
+const NAMES = [
+  "ink-900", "ink-800", "ink-700", "line", "line-strong", "bone", "bone-muted", "signal", "cyan", "gold", "ok", "focus",
+  "heat-1", "heat-2", "heat-3", "heat-4", "heat-5",
+] as const;
 
 type TokenName = (typeof NAMES)[number];
 type CamelCase<S extends string> = S extends `${infer A}-${infer B}` ? `${A}${Capitalize<CamelCase<B>>}` : S;

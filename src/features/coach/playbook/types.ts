@@ -2,7 +2,7 @@ import type { Point, Rotation } from "../../../map/mapData";
 
 export type Phase = "setup" | "exec" | "post" | "retake";
 export type Side = "attack" | "defense";
-export type Background = "minimap" | "callouts";
+export type Background = "minimap" | "callouts" | "heatmap";
 
 export const PHASES: Phase[] = ["setup", "exec", "post", "retake"];
 
