@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 // Dados de exemplo: o alerta de rotação é do Lotus, na defesa; o ponto forte do player é da Ascent.
 

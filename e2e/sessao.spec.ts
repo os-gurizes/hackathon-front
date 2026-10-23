@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 // Com os dados de exemplo, a sessão começa como coach; e-mail com "jogador" entra como player.
 

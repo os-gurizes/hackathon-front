@@ -16,11 +16,13 @@ const MeuTimePage = lazy(() => import("../features/coach/time/MeuTimePage"));
 const PranchetaPage = lazy(() => import("../features/coach/prancheta/PranchetaPage"));
 const MeuDesempenhoPage = lazy(() => import("../features/player/desempenho/MeuDesempenhoPage"));
 const MapasPage = lazy(() => import("../features/shared/mapas/MapasPage"));
+const PartidaPage = lazy(() => import("../features/coach/partida/PartidaPage"));
 
 export const ROUTES: RouteDef[] = [
   { path: "/coach/time", roles: ["coach", "admin"], page: MeuTimePage },
   { path: "/coach/prancheta", roles: ["coach", "admin"], page: PranchetaPage, wide: true },
   { path: "/coach/heatmap", roles: ["coach", "admin"], page: MapasPage, wide: true },
+  { path: "/coach/partida", roles: ["coach", "admin"], page: PartidaPage, wide: true },
   { path: "/player/desempenho", roles: ["player"], page: MeuDesempenhoPage },
   { path: "/player/mapas", roles: ["player"], page: MapasPage, wide: true },
 ];
@@ -29,7 +31,7 @@ export const ROUTES: RouteDef[] = [
 export const TABS: Record<"coach" | "player", Tab[]> = {
   coach: [
     { label: "Meu time", path: "/coach/time" },
-    { label: "Análise de partida" },
+    { label: "Análise de partida", path: "/coach/partida" },
     { label: "Prancheta", path: "/coach/prancheta" },
     { label: "Estratégias" },
     { label: "Elenco" },

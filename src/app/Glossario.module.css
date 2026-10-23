@@ -1,0 +1,14 @@
+.search { display: flex; flex-direction: column; gap: var(--space-1); }
+.search span { font: 600 13px/16px var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted); }
+.search input {
+  height: 40px; padding: 0 12px; background: var(--ink-900); border: 0; color: var(--bone);
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--line-strong); font: 500 15px/22px var(--font-sans);
+}
+.search input:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--focus); }
+.list { margin: 0; display: flex; flex-direction: column; }
+.item { padding: var(--space-3) 0; border-bottom: var(--border-hairline) solid var(--line); }
+.item dt { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.item dt strong { font: 700 16px/20px var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
+.nome { font-size: 13px; color: var(--bone-muted); }
+.item dd { margin: var(--space-1) 0 0; line-height: 22px; }
+.empty { margin: 0; color: var(--bone-muted); }

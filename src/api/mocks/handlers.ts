@@ -6,6 +6,10 @@ import {
   heatmapFor,
   MAP_STATS,
   MAPS_SUMMARY,
+  MATCH_ITEM,
+  MATCH_ROUNDS,
+  MATCHES,
+  ROUND_REPLAY,
   meFor,
   PLAYER_INSIGHTS,
   PLAYER_MATCHES,
@@ -97,6 +101,11 @@ export const handlers = [
   http.get(url("/players/:id"), authed(({ params }) => HttpResponse.json(PLAYER_PROFILE(Number(params.id))))),
   http.get(url("/players/:id/stats"), authed(() => HttpResponse.json(PLAYER_STATS))),
   http.get(url("/players/:id/matches"), authed(() => HttpResponse.json(PLAYER_MATCHES))),
+
+  http.get(url("/matches"), authed(() => HttpResponse.json(MATCHES))),
+  http.get(url("/matches/:id"), authed(() => HttpResponse.json({ ...MATCH_ITEM, gameVersion: "13.06", scoreboard: [] }))),
+  http.get(url("/matches/:id/rounds"), authed(() => HttpResponse.json(MATCH_ROUNDS))),
+  http.get(url("/matches/:id/rounds/:n/replay"), authed(({ params }) => HttpResponse.json(ROUND_REPLAY(Number(params.n))))),
 
   // Qualquer outra rota da API ainda não tem dado de exemplo: falha de forma explícita
   http.all(url("/*"), ({ request }) =>
