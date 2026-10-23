@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 const status = (page: Page) => page.locator("[data-status]");
 const phase = (page: Page, name: string) => page.getByRole("button", { name: new RegExp(`^${name}\\s+\\d+ ite`) });

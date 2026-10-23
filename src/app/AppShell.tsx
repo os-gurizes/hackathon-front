@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Me } from "../api";
 import { cx } from "../design/cx";
 import { Badge, Button, Icon } from "../design/primitives";
@@ -6,6 +6,9 @@ import { RIOT_DISCLAIMER } from "../copy/legal";
 import { linkHandler } from "./router";
 import type { Tab } from "./routes";
 import { displayName, roleLabel } from "./session";
+import { Glossario } from "./Glossario";
+import { Tour } from "./Tour";
+import { tourVisto } from "./tourState";
 import styles from "./AppShell.module.css";
 
 type Props = {
@@ -19,8 +22,13 @@ type Props = {
 
 export function AppShell({ me, tabs, path, wide, onLogout, children }: Props) {
   const isPlayer = me.role === "player";
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
+  // Primeiro acesso de cada papel abre o tour; depois, só pelo botão "Como usar"
+  const [tourOpen, setTourOpen] = useState(() => !tourVisto(me.role));
   return (
     <div className={cx(styles.shell, wide && styles.wide)}>
+      <Glossario open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
+      <Tour role={me.role} open={tourOpen} onClose={() => setTourOpen(false)} />
       <header className={styles.header}>
         <div className={styles.bar}>
           <a href="/" className={styles.brand} onClick={linkHandler("/")}>
@@ -33,6 +41,12 @@ export function AppShell({ me, tabs, path, wide, onLogout, children }: Props) {
             <Badge tone={isPlayer ? "neutral" : "defense"} icon={null}>
               {roleLabel[me.role]}
             </Badge>
+            <Button variant="ghost" size="sm" onClick={() => setTourOpen(true)}>
+              Como usar
+            </Button>
+            <Button variant="ghost" size="sm" icon="playbook" onClick={() => setGlossaryOpen(true)}>
+              Glossário
+            </Button>
             <Button variant="ghost" size="sm" onClick={onLogout}>
               Sair
             </Button>
