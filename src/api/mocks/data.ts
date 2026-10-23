@@ -5,6 +5,9 @@ import type {
   Heatmap,
   Insight,
   MapStats,
+  MatchList,
+  MatchRounds,
+  RoundReplay,
   MapSummary,
   Me,
   PlayerMatches,
@@ -400,3 +403,102 @@ export function heatmapFor(mapId: number, metric: Heatmap["metric"], resolution:
         : [],
   };
 }
+
+// Análise de partida: uma partida na Ascent, três rounds e o replay com abates, plant e defuse
+const ASCENT = map("ascent");
+const RIVAL = OPPONENTS[0]!;
+const RIVAL_PLAYERS = [
+  { id: 201, gameName: "Lobo", tagLine: "UF1" },
+  { id: 202, gameName: "Uivo", tagLine: "UF2" },
+];
+
+export const MATCH_ITEM: MatchList["items"][number] = {
+  id: 9100,
+  seriesId: 9000,
+  game: "a",
+  playedOn: "2026-10-12",
+  startedAt: "2026-10-12T19:00:00.000Z",
+  durationMs: 2_400_000,
+  tournament: "Univavá",
+  stage: { id: 3, name: "Classificatória 3" },
+  map: ASCENT,
+  red: { team: RIVAL, score: 9 },
+  blue: { team: TEAM, score: 13 },
+  winnerTeamId: TEAM.id,
+};
+
+export const MATCHES: MatchList = { items: [MATCH_ITEM], nextCursor: null };
+
+const winCurve = (start: number, end: number): MatchRounds[number]["winProbability"] => [
+  { tMs: 0, event: "start", attack: start },
+  { tMs: 30_000, event: "kill", attack: (start + end) / 2 },
+  { tMs: 70_000, event: "kill", attack: end },
+];
+
+export const MATCH_ROUNDS: MatchRounds = [0, 1, 2].map((n) => ({
+  number: n,
+  winnerTeamId: n === 1 ? RIVAL.id : TEAM.id,
+  winnerSide: n === 1 ? "attack" : "defense",
+  attackTeamId: RIVAL.id,
+  defenseTeamId: TEAM.id,
+  resultCode: n === 0 ? "Defuse" : "Elimination",
+  plantSite: n === 0 ? "B" : null,
+  plantTimeMs: n === 0 ? 45_000 : null,
+  buys: [
+    { teamId: RIVAL.id, buyType: n === 0 ? "pistol" : "full_buy", loadout: 3500 },
+    { teamId: TEAM.id, buyType: n === 0 ? "pistol" : "full_buy", loadout: 3600 },
+  ],
+  winProbability: n === 1 ? winCurve(0.5, 0.95) : winCurve(0.5, 0.05),
+}));
+
+const pos = (playerId: number, side: "attack" | "defense", x: number, y: number) => ({ playerId, side, x, y, view: 0 });
+
+export const ROUND_REPLAY = (n: number): RoundReplay => ({
+  matchId: MATCH_ITEM.id,
+  number: n,
+  mapId: ASCENT.id,
+  winnerTeamId: n === 1 ? RIVAL.id : TEAM.id,
+  resultCode: n === 0 ? "Defuse" : "Elimination",
+  players: [
+    { player: RIVAL_PLAYERS[0]!, teamId: RIVAL.id, side: "attack", agent: agent("Raze"), loadout: 3900 },
+    { player: RIVAL_PLAYERS[1]!, teamId: RIVAL.id, side: "attack", agent: agent("Omen"), loadout: 3500 },
+    { player: PLAYERS[0]!, teamId: TEAM.id, side: "defense", agent: agent("Jett"), loadout: 3600 },
+    { player: PLAYERS[1]!, teamId: TEAM.id, side: "defense", agent: agent("Killjoy"), loadout: 3400 },
+  ],
+  events: [
+    {
+      type: "kill",
+      tMs: 12_000,
+      killerId: PLAYERS[0]!.id,
+      victimId: RIVAL_PLAYERS[0]!.id,
+      kind: "enemy",
+      damageType: "Weapon",
+      weaponId: 1,
+      abilitySlot: null,
+      isFirstKill: true,
+      isTrade: false,
+      killerAt: { x: 0.3, y: 0.45 },
+      victimAt: { x: 0.3, y: 0.6 },
+      assistIds: [],
+      positions: [pos(RIVAL_PLAYERS[1]!.id, "attack", 0.5, 0.8), pos(PLAYERS[0]!.id, "defense", 0.3, 0.45), pos(PLAYERS[1]!.id, "defense", 0.72, 0.35)],
+    },
+    { type: "plant", tMs: 45_000, playerId: RIVAL_PLAYERS[1]!.id, site: "B", at: { x: 0.29, y: 0.33 } },
+    {
+      type: "kill",
+      tMs: 60_000,
+      killerId: PLAYERS[1]!.id,
+      victimId: RIVAL_PLAYERS[1]!.id,
+      kind: "enemy",
+      damageType: "Weapon",
+      weaponId: 1,
+      abilitySlot: null,
+      isFirstKill: false,
+      isTrade: true,
+      killerAt: { x: 0.36, y: 0.36 },
+      victimAt: { x: 0.31, y: 0.35 },
+      assistIds: [],
+      positions: [pos(PLAYERS[0]!.id, "defense", 0.3, 0.4), pos(PLAYERS[1]!.id, "defense", 0.36, 0.36)],
+    },
+    { type: "defuse", tMs: 70_000, playerId: PLAYERS[0]!.id, site: "B", at: null },
+  ],
+});
