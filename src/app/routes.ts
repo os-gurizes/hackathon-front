@@ -14,12 +14,21 @@ export type RouteDef = {
 // Telas carregadas sob demanda: o bundle inicial fica só com login e o shell
 const MeuTimePage = lazy(() => import("../features/coach/time/MeuTimePage"));
 const PranchetaPage = lazy(() => import("../features/coach/prancheta/PranchetaPage"));
+const EstrategiasPage = lazy(() => import("../features/coach/estrategias/EstrategiasPage"));
+const ElencoPage = lazy(() => import("../features/coach/elenco/ElencoPage"));
+const JogadorPage = lazy(() => import("../features/coach/elenco/JogadorPage"));
+const EconomiaPage = lazy(() => import("../features/coach/economia/EconomiaPage"));
 const MeuDesempenhoPage = lazy(() => import("../features/player/desempenho/MeuDesempenhoPage"));
 const MapasPage = lazy(() => import("../features/shared/mapas/MapasPage"));
 
 export const ROUTES: RouteDef[] = [
   { path: "/coach/time", roles: ["coach", "admin"], page: MeuTimePage },
   { path: "/coach/prancheta", roles: ["coach", "admin"], page: PranchetaPage, wide: true },
+  { path: "/coach/estrategias", roles: ["coach", "admin"], page: EstrategiasPage },
+  { path: "/coach/elenco", roles: ["coach", "admin"], page: ElencoPage },
+  // Visão de player de um jogador do elenco, em modo leitura: /coach/jogador?id=101
+  { path: "/coach/jogador", roles: ["coach", "admin"], page: JogadorPage },
+  { path: "/coach/economia", roles: ["coach", "admin"], page: EconomiaPage },
   { path: "/coach/heatmap", roles: ["coach", "admin"], page: MapasPage, wide: true },
   { path: "/player/desempenho", roles: ["player"], page: MeuDesempenhoPage },
   { path: "/player/mapas", roles: ["player"], page: MapasPage, wide: true },
@@ -31,11 +40,11 @@ export const TABS: Record<"coach" | "player", Tab[]> = {
     { label: "Meu time", path: "/coach/time" },
     { label: "Análise de partida" },
     { label: "Prancheta", path: "/coach/prancheta" },
-    { label: "Estratégias" },
-    { label: "Elenco" },
+    { label: "Estratégias", path: "/coach/estrategias" },
+    { label: "Elenco", path: "/coach/elenco" },
     { label: "Pressão e rotações" },
     { label: "Combos" },
-    { label: "Economia do time" },
+    { label: "Economia do time", path: "/coach/economia" },
     { label: "Scouting" },
     { label: "Heatmap", path: "/coach/heatmap" },
   ],

@@ -3,6 +3,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { q, type Insight, type MapStats, type TeamDetail, type TeamEconomy } from "../../../api";
 import { useMe } from "../../../app/session";
 import { navigate } from "../../../app/router";
+import { pranchetaLink } from "../pranchetaLink";
 import { estimateHelp } from "../../../copy/estimates";
 import { cx } from "../../../design/cx";
 import { Badge, Button, Icon, SectionLabel, Stat } from "../../../design/primitives";
@@ -101,13 +102,6 @@ function cellStyle(rate: number): CSSProperties {
 const bannerFor = (name: string) => {
   const front = FRONT_MAPS.find((m) => m.name.toLowerCase() === name.toLowerCase());
   return front ? assetUrl(front.banner) : undefined;
-};
-
-/** Abre uma estratégia nova na prancheta já no mapa e no lado do alerta, com o título dele. */
-const pranchetaLink = (a: Insight) => {
-  const params = new URLSearchParams({ mapa: a.map?.name.toLowerCase() ?? "", titulo: a.title });
-  if (a.side) params.set("lado", a.side);
-  return `/coach/prancheta?${params.toString()}`;
 };
 
 export default function MeuTimePage() {
@@ -266,7 +260,7 @@ export default function MeuTimePage() {
                 <p className={styles.alertBody}>{a.body}</p>
                 <p className={styles.note}>{a.isEstimate ? estimateHelp(a.kind) : `Leitura feita a partir de ${fmt(a.sampleSize)} casos.`}</p>
                 {a.map ? (
-                  <Button size="sm" className={styles.alertAction} onClick={() => navigate(pranchetaLink(a))}>
+                  <Button size="sm" className={styles.alertAction} onClick={() => a.map && navigate(pranchetaLink({ map: a.map, side: a.side, title: a.title }))}>
                     Abrir na prancheta
                   </Button>
                 ) : null}

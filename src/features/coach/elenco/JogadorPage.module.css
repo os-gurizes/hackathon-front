@@ -1,0 +1,13 @@
+.page { display: flex; flex-direction: column; gap: var(--space-8); }
+.head { display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-6); border-bottom: 1px solid var(--line); }
+.back {
+  display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
+  font: 600 13px/16px var(--font-display); letter-spacing: 0.08em; text-transform: uppercase;
+}
+/* A seta do set aponta para a direita: aqui ela volta */
+.backIcon { transform: scaleX(-1); }
+.title { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.name { margin: 0; font: 700 36px/40px var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; }
+.tag { color: var(--bone-muted); font-weight: 600; }
+.note { margin: 0; font-size: 13px; line-height: 18px; color: var(--bone-muted); }
+.state { color: var(--bone-muted); }
