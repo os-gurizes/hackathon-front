@@ -28,7 +28,7 @@ const fmt = (n: number, digits = 0) => n.toLocaleString("pt-BR", { maximumFracti
 const frontMapFor = (m: MapSummary): MapInfo | undefined => FRONT_MAPS.find((f) => f.name.toLowerCase() === m.name.toLowerCase());
 
 /** Frase-resumo antes do gráfico, como pede o spec: o heatmap vem como evidência. */
-function insightFor(metric: Metric, zones: Zone[], who: "Você" | "O time"): string | null {
+function insightFor(metric: Metric, zones: Zone[], who: string): string | null {
   const solid = zones.filter((z) => z.sampleSize >= MIN_ZONE_SAMPLE);
   if (!solid.length) return null;
   const top = [...solid].sort((a, b) => b.value - a.value)[0]!;
@@ -56,7 +56,8 @@ export default function MapasPage() {
   const me = useMe();
   const isPlayer = me.role === "player";
   const scope = isPlayer && me.player ? { player: me.player.id } : me.team ? { team: me.team.id } : {};
-  const who = isPlayer ? "Você" : "O time";
+  // Admin não tem time: vê todos os jogadores do campeonato
+  const who = isPlayer ? "Você" : me.team ? "O time" : "Quem joga";
 
   const maps = useQuery(q.catalog.maps());
   const available = useMemo(
@@ -146,7 +147,7 @@ export default function MapasPage() {
 
       <div className={styles.center}>
         <div className={styles.head}>
-          <SectionLabel index={3}>{isPlayer ? "Heatmap pessoal" : `Heatmap do time${me.team ? `: ${me.team.displayName}` : ""}`}</SectionLabel>
+          <SectionLabel index={3}>{isPlayer ? "Heatmap pessoal" : me.team ? `Heatmap do time: ${me.team.displayName}` : "Heatmap geral do campeonato"}</SectionLabel>
           <p className={styles.insight}>{insight ?? (zones.isPending ? "Lendo as partidas." : "Poucos dados neste filtro para uma leitura confiável.")}</p>
         </div>
         <div className={styles.map}>

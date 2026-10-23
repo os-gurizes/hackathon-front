@@ -1,4 +1,4 @@
-import { buildPalette, normalize } from "./heat";
+import { buildPalette, normalize, robustMax } from "./heat";
 
 describe("heatmap", () => {
   it("a paleta vai da primeira à última cor da escala", () => {
@@ -22,5 +22,14 @@ describe("heatmap", () => {
   it("sem valor positivo não desenha nada", () => {
     expect(normalize([{ x: 0, y: 0, value: 0 }])).toEqual([]);
     expect(normalize([])).toEqual([]);
+  });
+});
+
+describe("teto da escala", () => {
+  it("ignora picos isolados e zeros", () => {
+    const values = [...Array.from({ length: 99 }, (_, i) => i + 1), 10_000, 0];
+    expect(robustMax(values)).toBe(98);
+    expect(robustMax([])).toBe(0);
+    expect(robustMax([5])).toBe(5);
   });
 });

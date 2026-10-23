@@ -23,6 +23,16 @@ export function buildPalette(stops: string[]): Uint8ClampedArray {
   return lut;
 }
 
+/**
+ * Teto da escala: o percentil 98 dos valores. Com dados reais, poucas células muito quentes
+ * (spawn, bomb) definiriam o máximo e deixariam o resto do mapa quase sem cor.
+ */
+export function robustMax(values: number[], percentile = 0.98): number {
+  const sorted = values.filter((v) => v > 0).sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  return sorted[Math.min(sorted.length - 1, Math.floor(percentile * (sorted.length - 1)))]!;
+}
+
 /** Intensidade 0..1 de cada célula. K/D é comparado com o maior valor, igual às outras métricas. */
 export function normalize(cells: HeatCell[], maxValue?: number): Array<HeatCell & { t: number }> {
   const max = maxValue && maxValue > 0 ? maxValue : Math.max(0, ...cells.map((c) => c.value));
