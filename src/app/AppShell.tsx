@@ -7,6 +7,7 @@ import { linkHandler } from "./router";
 import type { Tab } from "./routes";
 import { displayName, roleLabel } from "./session";
 import { Glossario } from "./Glossario";
+import { AdminTeamPicker } from "./AdminTeamPicker";
 import { Tour } from "./Tour";
 import { tourVisto } from "./tourState";
 import styles from "./AppShell.module.css";
@@ -36,6 +37,7 @@ export function AppShell({ me, tabs, path, wide, onLogout, children }: Props) {
             <span>Sala Tática</span>
           </a>
           <div className={styles.user}>
+            {me.role === "admin" ? <AdminTeamPicker /> : null}
             <Icon name={isPlayer ? "player" : "team"} size={20} />
             <span>{displayName(me)}</span>
             <Badge tone={isPlayer ? "neutral" : "defense"} icon={null}>

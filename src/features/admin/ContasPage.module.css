@@ -1,0 +1,34 @@
+.page {
+  display: grid; gap: var(--space-4); align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "create" "list";
+}
+@media (min-width: 1100px) {
+  .page { grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-areas: "head head" "create list"; }
+}
+.head { grid-area: head; display: flex; flex-direction: column; gap: var(--space-2); }
+.create { grid-area: create; }
+.list { grid-area: list; min-width: 0; }
+.insight { margin: 0; font-size: 18px; line-height: 26px; font-weight: 500; }
+.notice:empty { display: none; }
+.noticeOn { align-self: flex-start; padding: var(--space-2) var(--space-3); background: var(--ink-800); box-shadow: inset 0 0 0 var(--border-hairline) var(--line-strong); font-size: 13px; }
+
+.panel { background: var(--ink-800); padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
+.form { display: flex; flex-direction: column; gap: var(--space-3); }
+.form :global(select) { width: 100%; }
+.field { display: flex; flex-direction: column; gap: var(--space-1); }
+.field label { font: 600 13px/16px var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-muted); }
+.field input {
+  height: 40px; padding: 0 12px; background: var(--ink-900); border: 0; color: var(--bone);
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--line-strong); font: 500 15px/22px var(--font-sans);
+}
+.field input:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--focus); }
+.field input::placeholder { color: var(--bone-muted); }
+
+.filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; }
+.filters .field { flex: 1 1 220px; }
+.tableWrap { overflow-x: auto; }
+.muted { color: var(--bone-muted); }
+.help { margin: 0; font-size: 13px; line-height: 18px; color: var(--bone-muted); }
+.error { margin: 0; display: flex; align-items: center; gap: var(--space-2); color: var(--signal-text); font-weight: 500; }
+.state { color: var(--bone-muted); }

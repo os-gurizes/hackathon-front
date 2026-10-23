@@ -21,6 +21,7 @@ const EconomiaPage = lazy(() => import("../features/coach/economia/EconomiaPage"
 const MeuDesempenhoPage = lazy(() => import("../features/player/desempenho/MeuDesempenhoPage"));
 const MapasPage = lazy(() => import("../features/shared/mapas/MapasPage"));
 const PartidaPage = lazy(() => import("../features/coach/partida/PartidaPage"));
+const ContasPage = lazy(() => import("../features/admin/ContasPage"));
 
 export const ROUTES: RouteDef[] = [
   { path: "/coach/time", roles: ["coach", "admin"], page: MeuTimePage },
@@ -32,6 +33,7 @@ export const ROUTES: RouteDef[] = [
   { path: "/coach/economia", roles: ["coach", "admin"], page: EconomiaPage },
   { path: "/coach/heatmap", roles: ["coach", "admin"], page: MapasPage, wide: true },
   { path: "/coach/partida", roles: ["coach", "admin"], page: PartidaPage, wide: true },
+  { path: "/admin/contas", roles: ["admin"], page: ContasPage, wide: true },
   { path: "/player/desempenho", roles: ["player"], page: MeuDesempenhoPage },
   { path: "/player/mapas", roles: ["player"], page: MapasPage, wide: true },
 ];
@@ -62,4 +64,6 @@ export const TABS: Record<"coach" | "player", Tab[]> = {
   ],
 };
 
-export const tabsFor = (role: Role) => (role === "player" ? TABS.player : TABS.coach);
+/** Admin vê as abas de coach (do time em análise) e mais a de contas. */
+export const tabsFor = (role: Role) =>
+  role === "player" ? TABS.player : role === "admin" ? [...TABS.coach, { label: "Contas", path: "/admin/contas" }] : TABS.coach;

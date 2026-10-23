@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { q, type MatchList } from "../../../api";
-import { useMe } from "../../../app/session";
+import { useTeamScope } from "../../../app/teamScope";
 import { cx } from "../../../design/cx";
 import { Badge, Button, Icon, SectionLabel } from "../../../design/primitives";
 import { MAPS as FRONT_MAPS } from "../../../map/mapData";
@@ -42,8 +42,7 @@ function perspective(m: MatchItem, teamId: number | null) {
 }
 
 export default function PartidaPage() {
-  const me = useMe();
-  const teamId = me.team?.id ?? null;
+  const teamId = useTeamScope()?.id ?? null;
   const [initial] = useState(readUrl);
   const [matchId, setMatchId] = useState<number | null>(initial.match);
   const [roundN, setRoundN] = useState<number | null>(initial.round);

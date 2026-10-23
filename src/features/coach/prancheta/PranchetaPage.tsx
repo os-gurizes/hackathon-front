@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type Konva from "konva";
 import { useQuery } from "@tanstack/react-query";
 import { q } from "../../../api";
-import { useMe } from "../../../app/session";
+import { useTeamScope } from "../../../app/teamScope";
 import { HeatLayer } from "../../../map/HeatLayer";
 import { cx } from "../../../design/cx";
 import { Button, Icon, Select } from "../../../design/primitives";
@@ -33,14 +33,14 @@ export default function PranchetaPage() {
   const playbook = history.present;
   const map = findMap(playbook.mapId) ?? DEFAULT_MAP;
   const tokens = useTokens();
-  const me = useMe();
+  const team = useTeamScope();
 
   // Fundo "heatmap do time": presença do time do coach no mapa da estratégia, vinda da API
   const apiMaps = useQuery(q.catalog.maps());
   const apiMap = apiMaps.data?.find((m) => m.name.toLowerCase() === map.name.toLowerCase());
   const teamHeat = useQuery({
-    ...q.maps.heatmap(apiMap?.id ?? 0, { metric: "presence", resolution: "cells", ...(me.team ? { team: me.team.id } : {}) }),
-    enabled: apiMap != null && me.team != null && playbook.background === "heatmap",
+    ...q.maps.heatmap(apiMap?.id ?? 0, { metric: "presence", resolution: "cells", ...(team ? { team: team.id } : {}) }),
+    enabled: apiMap != null && team != null && playbook.background === "heatmap",
   });
 
   const [tool, setTool] = useState<Tool>("select");
@@ -555,7 +555,7 @@ export default function PranchetaPage() {
             }}
           />
           <MapPanel
-            heatmapLabel={me.team && apiMap ? `Heatmap do time: ${me.team.displayName}` : undefined}
+            heatmapLabel={team && apiMap ? `Heatmap do time: ${team.displayName}` : undefined}
             playbook={playbook}
             onMap={(id) => {
               const next = findMap(id);

@@ -13,7 +13,7 @@ export type GetQuery<P extends keyof paths> = paths[P] extends { get: { paramete
   : never;
 
 /** Corpo enviado num POST ou PUT. */
-export type Body<P extends keyof paths, M extends "post" | "put"> = paths[P] extends {
+export type Body<P extends keyof paths, M extends "post" | "put" | "patch"> = paths[P] extends {
   [K in M]: { requestBody?: { content: { "application/json": infer B } } };
 }
   ? B
@@ -64,6 +64,11 @@ export type Insight = GetResponse<"/insights">[number];
 export type InsightQuery = GetQuery<"/insights">;
 export type WeaponStats = GetResponse<"/weapons/stats">;
 export type AgentStats = GetResponse<"/agents/stats">;
+
+// Admin
+export type AdminUser = GetResponse<"/admin/users">[number];
+export type AdminUserInput = Body<"/admin/users", "post">;
+export type AdminUserPatch = Body<"/admin/users/{id}", "patch">;
 
 // Playbook
 export type PlaybookStrategy = GetResponse<"/playbook/{id}">;
