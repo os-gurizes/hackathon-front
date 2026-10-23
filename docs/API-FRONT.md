@@ -67,3 +67,13 @@ O `vercel.json` faz em produção o que o proxy do Vite faz em dev: `/api/*` e `
 - **A URL da API está escrita no `vercel.json`.** Se o túnel do ngrok reiniciar, a URL muda: troque nas duas linhas de `rewrites` e faça um novo deploy. Um domínio fixo do ngrok (a conta gratuita tem um) evita isso.
 - Não configure `VITE_API_MOCK` nem `VITE_API_URL` na Vercel.
 - Para testar o build antes de subir: `npm run build` e `npm run preview` (usa o mesmo proxy, lendo `VITE_API_PROXY` do `.env.local`).
+
+## Mostrar para o time pelo ngrok
+
+```
+npm run build
+npm run preview -- --port 4173
+ngrok http 4173
+```
+
+O link `https://....ngrok-free.app` que o ngrok mostrar abre o app com a API de verdade (o preview usa o mesmo proxy do dev). Na primeira visita o ngrok gratuito mostra uma página de aviso: é só clicar em "Visit Site".
