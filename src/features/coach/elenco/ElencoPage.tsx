@@ -1,7 +1,8 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { q, type PlayerStats } from "../../../api";
 import { linkHandler } from "../../../app/router";
-import { useMe } from "../../../app/session";
+import { SemTime } from "../../../app/SemTime";
+import { useTeamScope } from "../../../app/teamScope";
 import { cx } from "../../../design/cx";
 import { Icon, SectionLabel, Table, Tooltip } from "../../../design/primitives";
 import styles from "./ElencoPage.module.css";
@@ -57,8 +58,8 @@ function headline(rows: Array<{ player: Player; stats: Totals }>) {
 const playerLink = (id: number) => `/coach/jogador?id=${id}`;
 
 export default function ElencoPage() {
-  const me = useMe();
-  const teamId = me.team?.id;
+  // Coach: o próprio time. Admin: o time em análise escolhido no topo
+  const teamId = useTeamScope()?.id;
 
   const team = useQuery({ ...q.teams.get(teamId ?? 0), enabled: teamId != null });
   // O elenco mais recente vem primeiro; jogador repetido em mais de um campeonato aparece uma vez
@@ -67,7 +68,7 @@ export default function ElencoPage() {
   // Só as partidas pelo time: o jogador pode ter jogado por outro antes
   const stats = useQueries({ queries: players.map((p) => q.players.stats(p.id, { team: teamId })) });
 
-  if (teamId == null) return <p className={styles.state}>Sua conta ainda não está ligada a um time.</p>;
+  if (teamId == null) return <SemTime className={styles.state} />;
   if (team.error) return <p className={styles.state}>{team.error.message}</p>;
   if (team.isPending) return <p className={styles.state}>Carregando o elenco.</p>;
   if (!players.length) return <p className={styles.state}>O time ainda não tem jogadores registrados.</p>;

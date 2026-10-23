@@ -39,10 +39,13 @@ export function useAdminTeamId(): number | null {
 }
 
 /** Times com partidas suficientes para uma leitura, do que mais jogou para o que menos jogou. */
-export function useTeamOptions(enabled = true) {
+export function useTeamOptionsStatus(enabled = true) {
   const teams = useQuery({ ...q.teams.list(), enabled });
-  return (teams.data ?? []).filter((t) => t.matches >= 5).sort((a, b) => b.matches - a.matches);
+  const options = (teams.data ?? []).filter((t) => t.matches >= 5).sort((a, b) => b.matches - a.matches);
+  return { options, loading: enabled && teams.isPending };
 }
+
+export const useTeamOptions = (enabled = true) => useTeamOptionsStatus(enabled).options;
 
 /**
  * O time que as telas de coach mostram: o do coach logado ou, para o admin, o escolhido em

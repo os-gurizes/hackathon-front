@@ -1,7 +1,8 @@
 import { useState, type CSSProperties } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { q, type TeamEconomy } from "../../../api";
-import { useMe } from "../../../app/session";
+import { SemTime } from "../../../app/SemTime";
+import { useTeamScope } from "../../../app/teamScope";
 import { cx } from "../../../design/cx";
 import { Badge, SectionLabel, Select, Tooltip } from "../../../design/primitives";
 import styles from "./EconomiaPage.module.css";
@@ -84,8 +85,8 @@ function cellStyle(winRate: number, expected: number): CSSProperties {
 }
 
 export default function EconomiaPage() {
-  const me = useMe();
-  const teamId = me.team?.id;
+  // Coach: o próprio time. Admin: o time em análise escolhido no topo
+  const teamId = useTeamScope()?.id;
 
   const [mapId, setMapId] = useState("");
   const [side, setSide] = useState<Side | "">("");
@@ -99,7 +100,7 @@ export default function EconomiaPage() {
     placeholderData: keepPreviousData,
   });
 
-  if (teamId == null) return <p className={styles.state}>Sua conta ainda não está ligada a um time.</p>;
+  if (teamId == null) return <SemTime className={styles.state} />;
   if (economy.error) return <p className={styles.state}>{economy.error.message}</p>;
   if (economy.isPending) return <p className={styles.state}>Carregando a economia do time.</p>;
 

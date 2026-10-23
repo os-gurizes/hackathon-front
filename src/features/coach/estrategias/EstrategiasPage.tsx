@@ -2,7 +2,8 @@ import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { q, type teamsService } from "../../../api";
 import { navigate } from "../../../app/router";
-import { useMe } from "../../../app/session";
+import { SemTime } from "../../../app/SemTime";
+import { useTeamScope } from "../../../app/teamScope";
 import { estimateHelp } from "../../../copy/estimates";
 import { cx } from "../../../design/cx";
 import { Badge, Button, SectionLabel, Select, Stat, Table } from "../../../design/primitives";
@@ -56,8 +57,8 @@ function headline(best: Row | undefined, worst: Row | undefined) {
 }
 
 export default function EstrategiasPage() {
-  const me = useMe();
-  const teamId = me.team?.id;
+  // Coach: o próprio time. Admin: o time em análise escolhido no topo
+  const teamId = useTeamScope()?.id;
 
   const [mapId, setMapId] = useState("");
   const [side, setSide] = useState<Side | "">("");
@@ -72,7 +73,7 @@ export default function EstrategiasPage() {
     placeholderData: keepPreviousData,
   });
 
-  if (teamId == null) return <p className={styles.state}>Sua conta ainda não está ligada a um time.</p>;
+  if (teamId == null) return <SemTime className={styles.state} />;
   if (list.error) return <p className={styles.state}>{list.error.message}</p>;
   if (list.isPending) return <p className={styles.state}>Carregando as estratégias.</p>;
 

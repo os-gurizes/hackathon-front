@@ -58,3 +58,11 @@ test("admin cria uma conta de player vinculada ao jogador do elenco e edita outr
   await expect(page.getByRole("status")).toContainText("Conta coach.lobos@salatatica.dev atualizada.");
   await expect(page.getByRole("row", { name: /coach\.lobos@salatatica\.dev/ })).toContainText("Admin");
 });
+
+test("nenhuma tela de coach pede vínculo de time ao admin", async ({ page }) => {
+  for (const aba of ["Meu time", "Análise de partida", "Estratégias", "Elenco", "Economia do time", "Heatmap"]) {
+    await page.getByRole("navigation", { name: "Visão do coach" }).getByRole("link", { name: aba, exact: true }).click();
+    await expect(page.getByText("Sua conta ainda não está ligada a um time")).toHaveCount(0);
+    await expect(page.getByText("Escolha um time em Time em análise")).toHaveCount(0);
+  }
+});
