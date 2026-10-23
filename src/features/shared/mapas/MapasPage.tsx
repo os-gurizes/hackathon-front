@@ -52,6 +52,17 @@ function insightFor(metric: Metric, zones: Zone[], who: string): string | null {
   }
 }
 
+function readInitialFilters(search: string): { mapSlug: string | null; side: Side | ""; metric: Metric } {
+  const params = new URLSearchParams(search);
+  const lado = params.get("lado");
+  const metrica = params.get("metrica");
+  return {
+    mapSlug: params.get("mapa")?.toLowerCase() ?? null,
+    side: lado === "attack" || lado === "defense" ? lado : "",
+    metric: METRICS.find((m) => m.id === metrica)?.id ?? "presence",
+  };
+}
+
 export default function MapasPage() {
   const me = useMe();
   const isPlayer = me.role === "player";
@@ -69,12 +80,15 @@ export default function MapasPage() {
     [maps.data],
   );
 
+  // Filtros iniciais podem vir na URL (ex.: "Ver no mapa" de um cartão de Meu desempenho)
+  const [initial] = useState(() => readInitialFilters(window.location.search));
   const [mapId, setMapId] = useState<number | null>(null);
-  const [side, setSide] = useState<Side | "">("");
-  const [metric, setMetric] = useState<Metric>("presence");
+  const [side, setSide] = useState<Side | "">(initial.side);
+  const [metric, setMetric] = useState<Metric>(initial.metric);
   const [callouts, setCallouts] = useState(true);
 
-  const current = available.find((m) => m.api.id === mapId) ?? available[0];
+  const current =
+    available.find((m) => m.api.id === mapId) ?? available.find((m) => m.front.slug === initial.mapSlug) ?? available[0];
   const filters = { ...scope, metric, ...(side ? { side } : {}) };
   const cells = useQuery({ ...q.maps.heatmap(current?.api.id ?? 0, { ...filters, resolution: "cells" }), enabled: current != null });
   const zones = useQuery({ ...q.maps.heatmap(current?.api.id ?? 0, { ...filters, resolution: "zones" }), enabled: current != null });

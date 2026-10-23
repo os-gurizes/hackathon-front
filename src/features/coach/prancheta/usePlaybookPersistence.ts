@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { DEFAULT_MAP, findMap } from "../../../map/mapData";
+import { DEFAULT_MAP, findMap, MAPS } from "../../../map/mapData";
 import { historyReducer, initHistory } from "../playbook/history";
 import { LocalPlaybookRepository, type PlaybookRepository, type PlaybookSummary } from "../playbook/repository";
 import { readShareFromHash, shareUrl } from "../playbook/serialize";
@@ -26,8 +26,29 @@ function sharedFromHash(): Playbook | null {
 function syncUrl(id: string) {
   const url = new URL(window.location.href);
   url.searchParams.set(PARAM, id);
+  for (const p of CONTEXT_PARAMS) url.searchParams.delete(p);
   url.hash = "";
   window.history.replaceState(null, "", url);
+}
+
+// Link vindo de um alerta ("Abrir na prancheta"): estratégia nova já no mapa, lado e título dele.
+// Os parâmetros saem da URL depois de abrir, para recarregar a página não criar outra.
+const CONTEXT_PARAMS = ["mapa", "lado", "titulo"];
+let contextCache: { search: string; playbook: Playbook | null } | null = null;
+function playbookFromContext(): Playbook | null {
+  const search = window.location.search;
+  if (contextCache?.search === search) return contextCache.playbook;
+  const params = new URLSearchParams(search);
+  const map = MAPS.find((m) => m.slug === params.get("mapa")?.toLowerCase());
+  let playbook: Playbook | null = null;
+  if (map) {
+    playbook = newPlaybook(map);
+    if (params.get("lado") === "defense") playbook.side = "defense";
+    const title = params.get("titulo")?.trim();
+    if (title) playbook.title = title.slice(0, 80);
+  }
+  contextCache = { search, playbook };
+  return playbook;
 }
 
 export function usePlaybookPersistence(repo: PlaybookRepository = defaultRepo) {
@@ -76,8 +97,12 @@ export function usePlaybookPersistence(repo: PlaybookRepository = defaultRepo) {
       const shared = sharedFromHash();
       let initial: Playbook | null = shared;
       let message: string | undefined;
+      const fromAlert = shared ? null : playbookFromContext();
       if (shared) {
         message = SHARED_NOTICE;
+      } else if (fromAlert) {
+        initial = fromAlert;
+        message = "Estratégia nova aberta a partir do alerta. Desenhe a resposta do time e ela fica salva.";
       } else {
         const id = new URL(window.location.href).searchParams.get(PARAM);
         initial = id ? await repo.get(id) : null;
