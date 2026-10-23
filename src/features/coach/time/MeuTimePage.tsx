@@ -3,6 +3,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { q, type Insight, type MapStats, type TeamDetail, type TeamEconomy } from "../../../api";
 import { useMe } from "../../../app/session";
 import { navigate } from "../../../app/router";
+import { estimateHelp } from "../../../copy/estimates";
 import { cx } from "../../../design/cx";
 import { Badge, Button, Icon, SectionLabel, Stat } from "../../../design/primitives";
 import { assetUrl, MAPS as FRONT_MAPS } from "../../../map/mapData";
@@ -39,7 +40,6 @@ const KIND_LABEL: Record<Insight["kind"], string> = {
   summary: "Resumo",
 };
 
-const ESTIMATE_HELP = "O jogo não registra quando cada habilidade foi usada. Este número é calculado a partir de abates e assistências.";
 
 /** Média ponderada por partidas: o mapa mais jogado pesa mais na taxa geral do time. */
 function teamSideRates(maps: TeamMap[]) {
@@ -83,12 +83,12 @@ function headline(team: TeamDetail) {
   const cells = team.maps
     .filter((m) => m.matches >= MIN_MATCHES)
     .flatMap((m) => [
-      { map: m.map.name, side: "ataque", rate: m.attackRoundWinRate },
-      { map: m.map.name, side: "defesa", rate: m.defenseRoundWinRate },
+      { map: m.map.name, side: "o ataque", rate: m.attackRoundWinRate },
+      { map: m.map.name, side: "a defesa", rate: m.defenseRoundWinRate },
     ]);
   const worst = [...cells].sort((a, b) => a.rate - b.rate)[0];
   if (!worst || worst.rate >= 0.5) return base;
-  return `${base} O ponto mais fraco é o ${worst.side} na ${worst.map}: ${pct(worst.rate)}% dos rounds vencidos.`;
+  return `${base} O ponto mais fraco é ${worst.side} na ${worst.map}: ${pct(worst.rate)}% dos rounds vencidos.`;
 }
 
 /** Cor mais forte quanto mais longe de 50%: vermelho abaixo, ciano acima. */
@@ -101,6 +101,13 @@ function cellStyle(rate: number): CSSProperties {
 const bannerFor = (name: string) => {
   const front = FRONT_MAPS.find((m) => m.name.toLowerCase() === name.toLowerCase());
   return front ? assetUrl(front.banner) : undefined;
+};
+
+/** Abre uma estratégia nova na prancheta já no mapa e no lado do alerta, com o título dele. */
+const pranchetaLink = (a: Insight) => {
+  const params = new URLSearchParams({ mapa: a.map?.name.toLowerCase() ?? "", titulo: a.title });
+  if (a.side) params.set("lado", a.side);
+  return `/coach/prancheta?${params.toString()}`;
 };
 
 export default function MeuTimePage() {
@@ -257,10 +264,12 @@ export default function MeuTimePage() {
                 </div>
                 <h3 className={styles.alertTitle}>{a.title}</h3>
                 <p className={styles.alertBody}>{a.body}</p>
-                <p className={styles.note}>{a.isEstimate ? ESTIMATE_HELP : `Leitura feita a partir de ${fmt(a.sampleSize)} casos.`}</p>
-                <Button size="sm" className={styles.alertAction} onClick={() => navigate("/coach/prancheta")}>
-                  Abrir na prancheta
-                </Button>
+                <p className={styles.note}>{a.isEstimate ? estimateHelp(a.kind) : `Leitura feita a partir de ${fmt(a.sampleSize)} casos.`}</p>
+                {a.map ? (
+                  <Button size="sm" className={styles.alertAction} onClick={() => navigate(pranchetaLink(a))}>
+                    Abrir na prancheta
+                  </Button>
+                ) : null}
               </article>
             ))}
           </div>

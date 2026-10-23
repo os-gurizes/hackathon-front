@@ -2,6 +2,7 @@ import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { q, type AnalyticsFilters, type Insight, type PlayerMatches, type PlayerStats } from "../../../api";
 import { linkHandler } from "../../../app/router";
+import { estimateHelp } from "../../../copy/estimates";
 import { useMe } from "../../../app/session";
 import { cx } from "../../../design/cx";
 import { Badge, SectionLabel, Select, Stat, type BadgeTone } from "../../../design/primitives";
@@ -95,7 +96,6 @@ const KIND_LABEL: Record<Insight["kind"], string> = {
   summary: "Resumo",
 };
 
-const ESTIMATE_HELP = "O jogo não registra quando cada habilidade foi usada. Este número é calculado a partir de abates e assistências.";
 
 const mapBanner = (name: string) => {
   const m = FRONT_MAPS.find((f) => f.name.toLowerCase() === name.toLowerCase());
@@ -238,7 +238,7 @@ export default function MeuDesempenhoPage() {
         ) : matches.isPending ? (
           <p className={styles.state}>Carregando partidas.</p>
         ) : (
-          <EvolutionChart matches={matches.data.items} overall={all.data?.overall ?? overall} />
+          <EvolutionChart matches={matches.data.items} />
         )}
       </section>
 
@@ -316,7 +316,7 @@ const TOP = 24;
 const BOTTOM = 216;
 
 /** Linha da métrica partida a partida contra a sua média, com a frase de tendência antes do gráfico. */
-function EvolutionChart({ matches, overall }: { matches: Match[]; overall: Totals }) {
+function EvolutionChart({ matches }: { matches: Match[] }) {
   const [metric, setMetric] = useState<ChartMetric>("kd");
   const info = CHART_METRICS.find((m) => m.id === metric)!;
   // Mais antiga à esquerda
@@ -324,11 +324,13 @@ function EvolutionChart({ matches, overall }: { matches: Match[]; overall: Total
   if (items.length < 2) return <p className={styles.state}>Poucas partidas para mostrar a evolução ({items.length} de 2 necessárias).</p>;
 
   const values = items.map((m) => (metric === "kd" ? m.kd : m.acs));
-  const mean = metric === "kd" ? overall.kd : overall.acs;
+  // Média das próprias partidas do gráfico: a referência tem de ser a dos pontos desenhados
+  const mean = avg(values);
   const lo = Math.min(mean, ...values);
   const hi = Math.max(mean, ...values);
   const pad = (hi - lo) * 0.15 || 1;
-  const [min, max] = [lo - pad, hi + pad];
+  // K/D e ACS nunca são negativos: o eixo começa no máximo em zero
+  const [min, max] = [Math.max(0, lo - pad), hi + pad];
   const X = (i: number) => LEFT + 24 + (i * (RIGHT - LEFT - 48)) / (items.length - 1);
   const Y = (v: number) => TOP + (1 - (v - min) / (max - min)) * (BOTTOM - TOP);
   const path = values.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join(" ");
@@ -396,7 +398,7 @@ function EvolutionChart({ matches, overall }: { matches: Match[]; overall: Total
         </span>
         <span>
           <span className={styles.legendMean} />
-          Sua média ({fmt(mean, info.digits)})
+          Média dessas {values.length} partidas ({fmt(mean, info.digits)})
         </span>
         <span>
           <span className={styles.legendLoss} />
@@ -408,6 +410,13 @@ function EvolutionChart({ matches, overall }: { matches: Match[]; overall: Total
 }
 
 const sideLabel: Record<Side, string> = { attack: "Ataque", defense: "Defesa" };
+
+/** Abre Meus mapas já no mapa, lado e métrica do cartão (mortes para o que piora, abates para o que ajuda). */
+const mapLink = (i: Insight) => {
+  const params = new URLSearchParams({ mapa: i.map?.name.toLowerCase() ?? "", metrica: i.polarity === "positive" ? "kills" : "deaths" });
+  if (i.side) params.set("lado", i.side);
+  return `/player/mapas?${params.toString()}`;
+};
 
 function InsightCard({ insight: i }: { insight: Insight }) {
   const banner = i.map ? mapBanner(i.map.name) : undefined;
@@ -427,9 +436,9 @@ function InsightCard({ insight: i }: { insight: Insight }) {
         </div>
         <h3 className={styles.cardTitle}>{i.title}</h3>
         <p className={styles.cardText}>{i.body}</p>
-        <p className={styles.note}>{i.isEstimate ? ESTIMATE_HELP : `Leitura feita a partir de ${fmt(i.sampleSize)} casos.`}</p>
+        <p className={styles.note}>{i.isEstimate ? estimateHelp(i.kind) : `Leitura feita a partir de ${fmt(i.sampleSize)} casos.`}</p>
         {i.map ? (
-          <a href="/player/mapas" onClick={linkHandler("/player/mapas")} className={styles.cardLink}>
+          <a href={mapLink(i)} onClick={linkHandler(mapLink(i))} className={styles.cardLink}>
             Ver no mapa
           </a>
         ) : null}
