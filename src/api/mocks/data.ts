@@ -11,8 +11,13 @@ import type {
   RoundReplay,
   MapSummary,
   Me,
+  PlayerAbilities,
+  PlayerAgents,
   PlayerMatches,
+  PlayerPatterns,
+  PlayerPressure,
   PlayerProfile,
+  PlayerWeapons,
   PlayerStats,
   TeamDetail,
   TeamEconomy,
@@ -576,3 +581,95 @@ export const ROUND_REPLAY = (n: number): RoundReplay => ({
     { type: "defuse", tMs: 70_000, playerId: PLAYERS[0]!.id, site: "B", at: null },
   ],
 });
+
+const agentStats = (matches: number, acs: number, kd: number) => ({
+  matches,
+  rounds: matches * 21,
+  roundWinRate: 0.54,
+  acs,
+  kd,
+  kills: matches * 17,
+  deaths: Math.round((matches * 17) / kd),
+  assists: matches * 4,
+  adr: acs * 0.66,
+  kast: 0.71,
+  headshotRate: 0.24,
+  firstKills: matches * 3,
+  firstDeaths: matches * 2,
+  clutchWins: 3,
+  clutchAttempts: 11,
+  multikills: matches,
+});
+
+export const PLAYER_AGENTS: PlayerAgents = [
+  { agent: agent("Jett"), stats: agentStats(7, 241, 1.18), baselineAcs: 222 },
+  { agent: agent("Raze"), stats: agentStats(3, 205, 0.96), baselineAcs: 218 },
+];
+
+export const PLAYER_ABILITIES: PlayerAbilities = {
+  isEstimate: true,
+  abilityKills: [
+    { agent: agent("Raze"), slot: "Ultimate", abilityName: "Estraga-Prazeres", kills: 6, averageWpGain: 0.081 },
+    { agent: agent("Raze"), slot: "Grenade", abilityName: "Granada Coletiva", kills: 4, averageWpGain: 0.052 },
+  ],
+  usage: { matches: 10, likelyOveruseMatches: 2, castsPerRound: 1.7, ultimateCasts: 9, ultimateKills: 6, ultimateKillsInDecidedRounds: 2 },
+};
+
+const weapon = (id: number, name: string, kills: number, rounds: number, win: number, baseWin: number): PlayerWeapons[number] => ({
+  weapon: { id, name, category: null },
+  kills,
+  firstKills: Math.round(kills / 6),
+  roundsEquipped: rounds,
+  winRateEquipped: win,
+  headshotRateEquipped: 0.27,
+  averageDistance: 17.4,
+  killsByDistance: { under10: Math.round(kills * 0.2), from10to20: Math.round(kills * 0.45), from20to30: Math.round(kills * 0.25), over30: Math.round(kills * 0.1) },
+  baseline: { winRateEquipped: baseWin, headshotRateEquipped: 0.24, averageDistance: 18.1 },
+});
+
+export const PLAYER_WEAPONS: PlayerWeapons = [
+  weapon(1, "Vandal", 112, 140, 0.58, 0.53),
+  weapon(2, "Phantom", 31, 44, 0.49, 0.52),
+  weapon(3, "Sheriff", 12, 26, 0.38, 0.35),
+  weapon(4, "Operator", 3, 6, 0.5, 0.55),
+];
+
+export const PLAYER_PATTERNS: PlayerPatterns = [
+  {
+    pattern: "isolated_death",
+    tier: "confirmed",
+    map: MAPS[9]!,
+    side: "attack",
+    zone: { id: 3, name: "Bomb B" },
+    rounds: 40,
+    occurrences: 24,
+    expected: 12,
+    rate: 0.6,
+    baselineRate: 0.3,
+    costRounds: 3.4,
+    examples: [
+      { matchId: 9010, number: 4 },
+      { matchId: 9008, number: 11 },
+    ],
+  },
+  {
+    pattern: "first_death_zone",
+    tier: "watch",
+    map: MAPS[1]!,
+    side: "defense",
+    zone: { id: 7, name: "Meio" },
+    rounds: 30,
+    occurrences: 8,
+    expected: 5,
+    rate: 0.27,
+    baselineRate: 0.17,
+    costRounds: 1.2,
+    examples: [{ matchId: 9009, number: 2 }],
+  },
+];
+
+export const PLAYER_PRESSURE: PlayerPressure = [
+  { context: "clutch", playerRounds: 34, winRate: 0.32, survivalRate: 0.29, kd: 1.4, wpDeltaPerRound: 0.04, baseline: { winRate: 0.24, survivalRate: 0.22, kd: 1.1 } },
+  { context: "post_plant", playerRounds: 61, winRate: 0.55, survivalRate: 0.41, kd: 1.0, wpDeltaPerRound: -0.02, baseline: { winRate: 0.66, survivalRate: 0.47, kd: 1.12 } },
+  { context: "match_point", playerRounds: 12, winRate: 0.5, survivalRate: 0.33, kd: 0.9, wpDeltaPerRound: 0, baseline: { winRate: 0.5, survivalRate: 0.36, kd: 1.0 } },
+];
