@@ -1,5 +1,5 @@
 import { http, HttpResponse, type DefaultBodyType, type HttpResponseResolver, type PathParams } from "msw";
-import { API_BASE } from "../client";
+import { API_BASE, AUTH_BASE } from "../client";
 import type { Heatmap, InsightQuery } from "../types";
 import {
   AGENTS,
@@ -42,6 +42,7 @@ export function setMockRole(role: MockRole) {
 }
 
 const url = (path: string) => `${API_BASE}${path}`;
+const authUrl = (path: string) => `${AUTH_BASE}${path}`;
 const error = (status: number, code: string, message: string) => HttpResponse.json({ error: { code, message } }, { status });
 const unauthorized = () => error(401, "UNAUTHORIZED", "Sessão expirada.");
 
@@ -51,18 +52,18 @@ function authed<P extends PathParams>(fn: HttpResponseResolver<P, DefaultBodyTyp
 }
 
 export const handlers = [
-  http.post(url("/auth/login"), async ({ request }) => {
+  http.post(authUrl("/auth/login"), async ({ request }) => {
     const body = (await request.json()) as { email?: string; password?: string };
     if (!body.email || !body.password || body.password === "errada") return error(401, "UNAUTHORIZED", "E-mail ou senha incorretos.");
     const role = /jogador|player/i.test(body.email) ? "player" : "coach";
     setMockRole(role);
     return HttpResponse.json(meFor(role));
   }),
-  http.post(url("/auth/logout"), () => {
+  http.post(authUrl("/auth/logout"), () => {
     setMockRole("none");
     return new HttpResponse(null, { status: 204 });
   }),
-  http.post(url("/auth/refresh"), () => (getMockRole() === "none" ? unauthorized() : new HttpResponse(null, { status: 204 }))),
+  http.post(authUrl("/auth/refresh"), () => (getMockRole() === "none" ? unauthorized() : new HttpResponse(null, { status: 204 }))),
   http.get(
     url("/me"),
     authed(() => HttpResponse.json(meFor(getMockRole() as "coach" | "player"))),

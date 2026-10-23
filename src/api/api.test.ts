@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { API_BASE, ApiError, authService, insightsService, mapsService, playersService, teamsService } from ".";
+import { API_BASE, AUTH_BASE, ApiError, authService, insightsService, mapsService, playersService, teamsService } from ".";
 import { handlers, setMockRole } from "./mocks/handlers";
 
 const server = setupServer(...handlers);
@@ -100,7 +100,7 @@ describe("sessão", () => {
         calls++;
         return calls === 1 ? new HttpResponse(null, { status: 401 }) : HttpResponse.json({ ok: true });
       }),
-      http.post(`${API_BASE}/auth/refresh`, () => {
+      http.post(`${AUTH_BASE}/auth/refresh`, () => {
         refreshed++;
         return new HttpResponse(null, { status: 204 });
       }),
@@ -122,7 +122,7 @@ describe("sessão", () => {
         }
         return HttpResponse.json({ ok: id });
       }),
-      http.post(`${API_BASE}/auth/refresh`, async () => {
+      http.post(`${AUTH_BASE}/auth/refresh`, async () => {
         refreshed++;
         await new Promise((r) => setTimeout(r, 20));
         return new HttpResponse(null, { status: 204 });

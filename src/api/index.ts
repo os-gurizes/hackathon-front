@@ -1,4 +1,4 @@
-export { api, API_BASE, ApiError, unwrap, type ApiErrorCode } from "./client";
+export { api, API_BASE, AUTH_BASE, ApiError, unwrap, type ApiErrorCode } from "./client";
 export { q, createQueryClient } from "./queries";
 export { authService } from "./services/auth";
 export { catalogService } from "./services/catalog";
