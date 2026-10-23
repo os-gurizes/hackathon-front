@@ -1,27 +1,37 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { q, type Heatmap, type HeatmapQuery, type MapSummary } from "../../../api";
+import { q, type MapSummary } from "../../../api";
 import { useMe } from "../../../app/session";
 import { cx } from "../../../design/cx";
-import { Badge, Icon, SectionLabel, Select, Table } from "../../../design/primitives";
+import { Badge, Icon, SectionLabel, Select, Table, Tooltip } from "../../../design/primitives";
 import { MAPS as FRONT_MAPS, type MapInfo } from "../../../map/mapData";
 import { HeatLayer } from "../../../map/HeatLayer";
 import { MapCanvas } from "../../../map/MapCanvas";
+import { compareZone, MIN_ZONE_SAMPLE, type Metric, type Zone } from "./zones";
 import styles from "./MapasPage.module.css";
 
-type Metric = HeatmapQuery["metric"] & string;
 type Side = "attack" | "defense";
-type Zone = Heatmap["zones"][number];
 
-const METRICS: Array<{ id: Metric; label: string; help: string }> = [
+const KD_HELP = "K/D: abates por morte. Acima de 1,0, você abate mais do que morre ali.";
+const TRADE_HELP = "Trade: quantas vezes um aliado abateu quem matou alguém do time ali, logo em seguida.";
+
+const METRICS: Array<{ id: Metric; label: string; help: ReactNode }> = [
   { id: "presence", label: "Presença", help: "Onde você estava quando algum abate aconteceu no round." },
   { id: "kills", label: "Abates", help: "Onde você estava quando abateu alguém." },
   { id: "deaths", label: "Mortes", help: "Onde você estava quando morreu." },
-  { id: "kd", label: "K/D por local", help: "K/D: abates por morte em cada local. Acima de 1,0, você abate mais do que morre ali." },
+  {
+    id: "kd",
+    label: "Abates por morte",
+    help: (
+      <>
+        <Tooltip term="K/D">{KD_HELP}</Tooltip> em cada local: acima de 1,0, você abate mais do que morre ali.
+      </>
+    ),
+  },
   { id: "first_kills", label: "Primeiro abate", help: "Onde saiu o primeiro abate do round a seu favor." },
 ];
 
-const MIN_ZONE_SAMPLE = 8;
+const MIN_TEAM_MATCHES = 5;
 const fmt = (n: number, digits = 0) => n.toLocaleString("pt-BR", { maximumFractionDigits: digits, minimumFractionDigits: digits });
 
 /** Liga o mapa da API (id numérico) ao minimapa local pelo nome. */
@@ -52,25 +62,38 @@ function insightFor(metric: Metric, zones: Zone[], who: string): string | null {
   }
 }
 
-function readInitialFilters(search: string): { mapSlug: string | null; side: Side | ""; metric: Metric } {
+type Filters = { mapSlug: string | null; side: Side | ""; metric: Metric; team: number | null };
+
+function readFilters(search: string): Filters {
   const params = new URLSearchParams(search);
   const lado = params.get("lado");
   const metrica = params.get("metrica");
+  const time = Number(params.get("time"));
   return {
     mapSlug: params.get("mapa")?.toLowerCase() ?? null,
     side: lado === "attack" || lado === "defense" ? lado : "",
     metric: METRICS.find((m) => m.id === metrica)?.id ?? "presence",
+    team: Number.isInteger(time) && time > 0 ? time : null,
   };
+}
+
+/** Os filtros ficam na URL: o link copiado abre a mesma leitura (spec, seção 7). */
+function writeFilters(f: Filters) {
+  const url = new URL(window.location.href);
+  const set = (k: string, v: string | null) => (v ? url.searchParams.set(k, v) : url.searchParams.delete(k));
+  set("mapa", f.mapSlug);
+  set("lado", f.side || null);
+  set("metrica", f.metric === "presence" ? null : f.metric);
+  set("time", f.team ? String(f.team) : null);
+  if (url.href !== window.location.href) window.history.replaceState(null, "", url);
 }
 
 export default function MapasPage() {
   const me = useMe();
   const isPlayer = me.role === "player";
-  const scope = isPlayer && me.player ? { player: me.player.id } : me.team ? { team: me.team.id } : {};
-  // Admin não tem time: vê todos os jogadores do campeonato
-  const who = isPlayer ? "Você" : me.team ? "O time" : "Quem joga";
 
   const maps = useQuery(q.catalog.maps());
+  const teams = useQuery({ ...q.teams.list(), enabled: !isPlayer });
   const available = useMemo(
     () =>
       (maps.data ?? [])
@@ -80,18 +103,34 @@ export default function MapasPage() {
     [maps.data],
   );
 
-  // Filtros iniciais podem vir na URL (ex.: "Ver no mapa" de um cartão de Meu desempenho)
-  const [initial] = useState(() => readInitialFilters(window.location.search));
-  const [mapId, setMapId] = useState<number | null>(null);
+  // Filtros iniciais podem vir na URL (ex.: "Ver no mapa" de um cartão ou um link compartilhado)
+  const [initial] = useState(() => readFilters(window.location.search));
+  const [mapSlug, setMapSlug] = useState<string | null>(initial.mapSlug);
   const [side, setSide] = useState<Side | "">(initial.side);
   const [metric, setMetric] = useState<Metric>(initial.metric);
+  // Coach: o próprio time por padrão, ou outro para estudar o adversário. Admin começa com todos.
+  const [teamId, setTeamId] = useState<number | null>(isPlayer ? null : (initial.team ?? me.team?.id ?? null));
   const [callouts, setCallouts] = useState(true);
 
-  const current =
-    available.find((m) => m.api.id === mapId) ?? available.find((m) => m.front.slug === initial.mapSlug) ?? available[0];
-  const filters = { ...scope, metric, ...(side ? { side } : {}) };
-  const cells = useQuery({ ...q.maps.heatmap(current?.api.id ?? 0, { ...filters, resolution: "cells" }), enabled: current != null });
-  const zones = useQuery({ ...q.maps.heatmap(current?.api.id ?? 0, { ...filters, resolution: "zones" }), enabled: current != null });
+  const current = available.find((m) => m.front.slug === mapSlug) ?? available[0];
+  const ownTeam = me.team?.id ?? null;
+  const viewedTeam = teams.data?.find((t) => t.team.id === teamId)?.team ?? (teamId === ownTeam ? me.team : null);
+  const isRival = !isPlayer && teamId != null && teamId !== ownTeam;
+
+  useEffect(() => {
+    if (current) writeFilters({ mapSlug: current.front.slug, side, metric, team: teamId === ownTeam ? null : teamId });
+  }, [current, side, metric, teamId, ownTeam]);
+
+  const scope = isPlayer && me.player ? { player: me.player.id } : teamId ? { team: teamId } : {};
+  const hasScope = Object.keys(scope).length > 0;
+  const who = isPlayer ? "Você" : viewedTeam ? (isRival ? viewedTeam.displayName : "O time") : "Quem joga";
+
+  const filters = { metric, ...(side ? { side } : {}) };
+  const mapApiId = current?.api.id ?? 0;
+  const cells = useQuery({ ...q.maps.heatmap(mapApiId, { ...scope, ...filters, resolution: "cells" }), enabled: current != null });
+  const zones = useQuery({ ...q.maps.heatmap(mapApiId, { ...scope, ...filters, resolution: "zones" }), enabled: current != null });
+  // Base de comparação: o mesmo mapa e filtro com todos os jogadores do campeonato
+  const zonesAll = useQuery({ ...q.maps.heatmap(mapApiId, { ...filters, resolution: "zones" }), enabled: current != null && hasScope });
 
   const zoneRows = useMemo(
     () => [...(zones.data?.zones ?? [])].sort((a, b) => b.value - a.value).slice(0, 8).map((z) => ({ ...z, id: z.zoneId })),
@@ -101,8 +140,24 @@ export default function MapasPage() {
   const insight = zones.data ? insightFor(metric, zones.data.zones, who) : null;
   const metricInfo = METRICS.find((m) => m.id === metric)!;
 
+  const teamOptions = useMemo(() => {
+    const list = (teams.data ?? []).filter((t) => t.matches >= MIN_TEAM_MATCHES).sort((a, b) => a.team.displayName.localeCompare(b.team.displayName, "pt-BR"));
+    const own = list.find((t) => t.team.id === ownTeam);
+    return [
+      ...(own ? [{ value: String(own.team.id), label: `Meu time: ${own.team.displayName}` }] : []),
+      ...(me.role === "admin" ? [{ value: "", label: "Todos os times" }] : []),
+      ...list.filter((t) => t.team.id !== ownTeam).map((t) => ({ value: String(t.team.id), label: `${t.team.displayName} (${t.matches} partidas)` })),
+    ];
+  }, [teams.data, ownTeam, me.role]);
+
   if (maps.error) return <p className={styles.state}>{maps.error.message}</p>;
   if (!current) return <p className={styles.state}>{maps.isPending ? "Carregando mapas." : "Nenhum mapa com dados ainda."}</p>;
+
+  const heading = isPlayer
+    ? "Heatmap pessoal"
+    : viewedTeam
+      ? `${isRival ? "Heatmap do adversário" : "Heatmap do time"}: ${viewedTeam.displayName}`
+      : "Heatmap geral do campeonato";
 
   return (
     <div className={styles.page}>
@@ -111,11 +166,14 @@ export default function MapasPage() {
           <SectionLabel index={1} as="div">
             Filtros
           </SectionLabel>
+          {!isPlayer && teamOptions.length ? (
+            <Select label="Time" value={teamId ? String(teamId) : ""} options={teamOptions} onChange={(v) => setTeamId(v ? Number(v) : null)} />
+          ) : null}
           <Select
             label="Mapa"
-            value={String(current.api.id)}
-            options={available.map((m) => ({ value: String(m.api.id), label: `${m.api.name} (${m.api.matches} partidas)` }))}
-            onChange={(v) => setMapId(Number(v))}
+            value={current.front.slug}
+            options={available.map((m) => ({ value: m.front.slug, label: `${m.api.name} (${m.api.matches} partidas)` }))}
+            onChange={setMapSlug}
           />
           <div role="group" aria-label="Lado" className={styles.sides}>
             {(
@@ -161,7 +219,7 @@ export default function MapasPage() {
 
       <div className={styles.center}>
         <div className={styles.head}>
-          <SectionLabel index={3}>{isPlayer ? "Heatmap pessoal" : me.team ? `Heatmap do time: ${me.team.displayName}` : "Heatmap geral do campeonato"}</SectionLabel>
+          <SectionLabel index={3}>{heading}</SectionLabel>
           <p className={styles.insight}>{insight ?? (zones.isPending ? "Lendo as partidas." : "Poucos dados neste filtro para uma leitura confiável.")}</p>
         </div>
         <div className={styles.map}>
@@ -214,14 +272,36 @@ export default function MapasPage() {
                 },
                 { key: "kills", label: "Abates", numeric: true, render: (z) => fmt(z.kills) },
                 { key: "deaths", label: "Mortes", numeric: true, render: (z) => fmt(z.deaths) },
-                { key: "trade", label: "Trade", numeric: true, render: (z) => (z.tradeRate == null ? "sem dado" : `${fmt(z.tradeRate * 100)}%`) },
+                {
+                  key: "trade",
+                  label: <Tooltip term="Trade">{TRADE_HELP}</Tooltip>,
+                  numeric: true,
+                  render: (z) => (z.tradeRate == null ? "sem dado" : `${fmt(z.tradeRate * 100)}%`),
+                },
+                ...(hasScope
+                  ? [
+                      {
+                        key: "cmp",
+                        label: "Contra a média",
+                        numeric: true,
+                        render: (z: Zone) => {
+                          const c = zonesAll.data ? compareZone(metric, z, zones.data?.zones ?? [], zonesAll.data.zones) : null;
+                          return c ? <span className={styles[c.tone]}>{c.text}</span> : <span className={styles.low}>sem base</span>;
+                        },
+                      },
+                    ]
+                  : []),
               ]}
               rows={zoneRows}
             />
           ) : (
             <p className={styles.help}>{zones.isPending ? "Carregando zonas." : "Sem zonas com dados neste filtro."}</p>
           )}
-          <p className={styles.help}>Trade: quantas vezes um aliado abateu quem matou alguém do time ali, logo em seguida.</p>
+          {hasScope ? (
+            <p className={styles.help}>
+              Contra a média: quanto {isPlayer ? "da sua" : "da"} {metricInfo.label.toLowerCase()} cai na zona, comparado com todos os jogadores do campeonato no mesmo mapa e filtro.
+            </p>
+          ) : null}
         </section>
       </aside>
     </div>

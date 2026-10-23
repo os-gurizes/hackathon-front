@@ -42,5 +42,5 @@ test("Ver no mapa abre Meus mapas no mapa e na métrica do cartão", async ({ pa
   await cartao.getByRole("link", { name: "Ver no mapa" }).click();
   await expect(page).toHaveURL(/\/player\/mapas\?mapa=ascent&metrica=kills/);
   await expect(page.getByRole("combobox", { name: "Mapa", exact: true }).locator("option:checked")).toContainText("Ascent");
-  await expect(page.getByRole("button", { name: "Abates" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Abates", exact: true })).toHaveAttribute("aria-pressed", "true");
 });
