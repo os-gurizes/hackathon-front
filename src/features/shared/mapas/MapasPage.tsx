@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { q, type MapSummary } from "../../../api";
 import { useMe } from "../../../app/session";
+import { useTeamScope } from "../../../app/teamScope";
 import { cx } from "../../../design/cx";
 import { Badge, Icon, SectionLabel, Select, Table, Tooltip } from "../../../design/primitives";
 import { MAPS as FRONT_MAPS, type MapInfo } from "../../../map/mapData";
@@ -90,6 +91,8 @@ function writeFilters(f: Filters) {
 
 export default function MapasPage() {
   const me = useMe();
+  // Coach: o próprio time. Admin: o time em análise escolhido no topo
+  const scopeTeam = useTeamScope();
   const isPlayer = me.role === "player";
 
   const maps = useQuery(q.catalog.maps());
@@ -109,12 +112,12 @@ export default function MapasPage() {
   const [side, setSide] = useState<Side | "">(initial.side);
   const [metric, setMetric] = useState<Metric>(initial.metric);
   // Coach: o próprio time por padrão, ou outro para estudar o adversário. Admin começa com todos.
-  const [teamId, setTeamId] = useState<number | null>(isPlayer ? null : (initial.team ?? me.team?.id ?? null));
+  const [teamId, setTeamId] = useState<number | null>(isPlayer ? null : (initial.team ?? scopeTeam?.id ?? null));
   const [callouts, setCallouts] = useState(true);
 
   const current = available.find((m) => m.front.slug === mapSlug) ?? available[0];
-  const ownTeam = me.team?.id ?? null;
-  const viewedTeam = teams.data?.find((t) => t.team.id === teamId)?.team ?? (teamId === ownTeam ? me.team : null);
+  const ownTeam = scopeTeam?.id ?? null;
+  const viewedTeam = teams.data?.find((t) => t.team.id === teamId)?.team ?? (teamId === ownTeam ? scopeTeam : null);
   const isRival = !isPlayer && teamId != null && teamId !== ownTeam;
 
   useEffect(() => {
@@ -144,7 +147,7 @@ export default function MapasPage() {
     const list = (teams.data ?? []).filter((t) => t.matches >= MIN_TEAM_MATCHES).sort((a, b) => a.team.displayName.localeCompare(b.team.displayName, "pt-BR"));
     const own = list.find((t) => t.team.id === ownTeam);
     return [
-      ...(own ? [{ value: String(own.team.id), label: `Meu time: ${own.team.displayName}` }] : []),
+      ...(own ? [{ value: String(own.team.id), label: `${me.role === "admin" ? "Time em análise" : "Meu time"}: ${own.team.displayName}` }] : []),
       ...(me.role === "admin" ? [{ value: "", label: "Todos os times" }] : []),
       ...list.filter((t) => t.team.id !== ownTeam).map((t) => ({ value: String(t.team.id), label: `${t.team.displayName} (${t.matches} partidas)` })),
     ];

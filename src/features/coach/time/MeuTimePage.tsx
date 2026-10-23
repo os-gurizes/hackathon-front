@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { q, type Insight, type MapStats, type TeamDetail, type TeamEconomy } from "../../../api";
-import { useMe } from "../../../app/session";
+import { useTeamScope } from "../../../app/teamScope";
 import { navigate } from "../../../app/router";
 import { estimateHelp } from "../../../copy/estimates";
 import { cx } from "../../../design/cx";
@@ -111,8 +111,7 @@ const pranchetaLink = (a: Insight) => {
 };
 
 export default function MeuTimePage() {
-  const me = useMe();
-  const teamId = me.team?.id;
+  const teamId = useTeamScope()?.id;
 
   const team = useQuery({ ...q.teams.get(teamId ?? 0), enabled: teamId != null });
   const economy = useQuery({ ...q.teams.economy(teamId ?? 0), enabled: teamId != null });

@@ -1,6 +1,7 @@
 // Dados de exemplo para desenvolver sem a API. Nomes de time e jogadores são fictícios.
 // Os tipos vêm do openapi.json: se o contrato mudar, o TypeScript aponta o que atualizar aqui.
 import type {
+  AdminUser,
   ApiAgent,
   Heatmap,
   Insight,
@@ -61,13 +62,22 @@ const agent = (name: string) => {
   return { id: a.id, name: a.name, role: a.role };
 };
 
-export const meFor = (role: "coach" | "player"): Me => ({
-  id: role === "coach" ? 1 : 2,
-  email: role === "coach" ? "coach@salatatica.dev" : "jogador@salatatica.dev",
+export const meFor = (role: "coach" | "player" | "admin"): Me => ({
+  id: { coach: 1, player: 2, admin: 3 }[role],
+  email: { coach: "coach@salatatica.dev", player: "jogador@salatatica.dev", admin: "admin@salatatica.dev" }[role],
   role,
   player: role === "player" ? PLAYERS[0]! : null,
-  team: TEAM,
+  // Admin não pertence a time: escolhe qual analisar
+  team: role === "admin" ? null : TEAM,
 });
+
+/** Contas iniciais da tela de admin; a lista é editada em memória pelos handlers. */
+export const initialAdminUsers = (): AdminUser[] => [
+  { id: 1, email: "coach@salatatica.dev", role: "coach", playerId: null, teamId: TEAM.id, createdAt: "2026-10-20T12:00:00.000Z" },
+  { id: 2, email: "jogador@salatatica.dev", role: "player", playerId: PLAYERS[0]!.id, teamId: TEAM.id, createdAt: "2026-10-20T12:00:00.000Z" },
+  { id: 3, email: "admin@salatatica.dev", role: "admin", playerId: null, teamId: null, createdAt: "2026-10-20T12:00:00.000Z" },
+  { id: 4, email: "coach.lobos@salatatica.dev", role: "coach", playerId: null, teamId: OPPONENTS[0]!.id, createdAt: "2026-10-21T12:00:00.000Z" },
+];
 
 export const TEAMS: TeamSummary[] = [
   { team: TEAM, matches: 18, wins: 11, winRate: 0.611 },

@@ -1,5 +1,6 @@
 import { QueryClient, queryOptions } from "@tanstack/react-query";
 import { ApiError } from "./client";
+import { adminService } from "./services/admin";
 import { authService } from "./services/auth";
 import { catalogService } from "./services/catalog";
 import { insightsService, mapsService, statsService } from "./services/analytics";
@@ -79,6 +80,10 @@ export const q = {
   },
 
   insights: (f: InsightQuery) => queryOptions({ queryKey: ["insights", f], queryFn: () => insightsService.list(f) }),
+
+  admin: {
+    users: () => queryOptions({ queryKey: ["admin", "users"], queryFn: adminService.users }),
+  },
 
   playbook: {
     list: (teamId: number, f?: GetQuery<"/teams/{id}/playbook">) =>

@@ -1,5 +1,6 @@
 export { api, API_BASE, AUTH_BASE, ApiError, unwrap, type ApiErrorCode } from "./client";
 export { q, createQueryClient } from "./queries";
+export { adminService } from "./services/admin";
 export { authService } from "./services/auth";
 export { catalogService } from "./services/catalog";
 export { insightsService, mapsService, statsService } from "./services/analytics";
