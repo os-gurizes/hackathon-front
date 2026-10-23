@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { q, type Insight, type MapStats, type TeamDetail, type TeamEconomy } from "../../../api";
+import { SemTime } from "../../../app/SemTime";
 import { useTeamScope } from "../../../app/teamScope";
 import { navigate } from "../../../app/router";
 import { pranchetaLink } from "../pranchetaLink";
@@ -114,7 +115,7 @@ export default function MeuTimePage() {
   // Sem filtro de time: é a média de todos os times do campeonato em cada mapa
   const mapStats = useQueries({ queries: maps.map((m) => q.maps.stats(m.map.id)) });
 
-  if (teamId == null) return <p className={styles.state}>Sua conta ainda não está ligada a um time.</p>;
+  if (teamId == null) return <SemTime className={styles.state} />;
   if (team.error) return <p className={styles.state}>{team.error.message}</p>;
   if (team.isPending) return <p className={styles.state}>Carregando o time.</p>;
 
